@@ -11,7 +11,7 @@ export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
   const [seconds, setSeconds] = useState(0);
   
   useEffect(() => {
-    let interval: number;
+    let interval: NodeJS.Timeout;
     
     if (isActive) {
       interval = setInterval(() => {
