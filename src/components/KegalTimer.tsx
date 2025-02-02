@@ -17,7 +17,7 @@ export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
       interval = setInterval(() => {
         setSeconds(prev => {
           if (prev >= 7) {
-            setIsBreathingIn(!isBreathingIn);
+            setIsBreathingIn(current => !current);
             return 0;
           }
           return prev + 1;
@@ -36,9 +36,13 @@ export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
       {/* Animated inner circle */}
       <div
         className={cn(
-          "absolute inset-4 rounded-full bg-[#9b87f5] transition-all duration-300",
+          "absolute inset-4 rounded-full bg-[#9b87f5] scale-75 transition-all duration-300",
           isActive && (isBreathingIn ? "breathe-in" : "breathe-out")
         )}
+        style={{
+          transform: `scale(${isBreathingIn ? 0.8 : 0.6})`,
+          opacity: isBreathingIn ? 1 : 0.5,
+        }}
       />
       
       {/* Text overlay */}
