@@ -20,7 +20,8 @@ const Index = () => {
 
   const handleToggle = () => {
     if (!isActive) {
-      // Starting new session - don't reset time to allow cumulative tracking
+      // Reset time when starting new session
+      setTime(0);
       setIsActive(true);
     } else {
       setIsActive(false);
