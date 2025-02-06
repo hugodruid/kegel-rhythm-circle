@@ -37,31 +37,39 @@
 }
 
 @keyframes breathe-in {
-  from {
-    transform: scale(0.8);
+  0% {
+    transform: scale(0.6);
     opacity: 0.5;
   }
-  to {
-    transform: scale(1);
+  90% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.1);
     opacity: 1;
   }
 }
 
 @keyframes breathe-out {
-  from {
-    transform: scale(1);
+  0% {
+    transform: scale(1.1);
     opacity: 1;
   }
-  to {
-    transform: scale(0.8);
+  90% {
+    transform: scale(0.6);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(0.6);
     opacity: 0.5;
   }
 }
 
 .breathe-in {
-  animation: breathe-in 4s ease-in-out;
+  animation: breathe-in 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .breathe-out {
-  animation: breathe-out 4s ease-in-out;
+  animation: breathe-out 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }

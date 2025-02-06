@@ -7,7 +7,7 @@ interface KegalTimerProps {
 }
 
 export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
-  const [isBreathingIn, setIsBreathingIn] = useState(true);
+  const [isBreathingIn, setIsBreathingIn] = useState(false);
   const [seconds, setSeconds] = useState(0);
   
   useEffect(() => {
@@ -40,7 +40,7 @@ export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
           isActive && (isBreathingIn ? "breathe-in" : "breathe-out")
         )}
         style={{
-          transform: `scale(${isBreathingIn ? 1 : 0.8})`,
+          transform: `scale(${isBreathingIn ? 1.1 : 0.6})`,
           opacity: isBreathingIn ? 1 : 0.5,
         }}
       />
