@@ -14,23 +14,29 @@ export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
     let interval: NodeJS.Timeout;
     
     if (isActive) {
-      setIsBreathingIn(true); // Always start with breathing in
+      setIsBreathingIn(true);
       setSeconds(0);
+      
       interval = setInterval(() => {
         setSeconds(prev => {
-          if (prev >= 5) { // Changed from 7 to 5 seconds
+          const newSeconds = prev + 1;
+          if (newSeconds >= 5) {
             setIsBreathingIn(current => !current);
             return 0;
           }
-          return prev + 1;
+          return newSeconds;
         });
       }, 1000);
     } else {
-      setIsBreathingIn(true); // Reset to breathing in when stopped
+      setIsBreathingIn(true);
       setSeconds(0);
     }
 
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
   }, [isActive]);
 
   return (
@@ -41,13 +47,9 @@ export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
       {/* Animated inner circle */}
       <div
         className={cn(
-          "absolute inset-4 rounded-full bg-[#9b87f5] transition-all duration-300",
-          isActive && (isBreathingIn ? "breathe-in" : "breathe-out")
+          "absolute inset-4 rounded-full bg-[#9b87f5] transition-transform duration-[5000ms] ease-in-out",
+          isActive && (isBreathingIn ? "scale-110 opacity-100" : "scale-60 opacity-50")
         )}
-        style={{
-          transform: `scale(${isBreathingIn ? 1.1 : 0.6})`,
-          opacity: isBreathingIn ? 1 : 0.5,
-        }}
       />
       
       {/* Text overlay */}
