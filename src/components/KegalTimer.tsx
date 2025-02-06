@@ -129,9 +129,13 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
 
       <button 
         onClick={toggleMute}
-        className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+        className="absolute top-4 right-4 z-10 p-2.5 rounded-full bg-black/20 hover:bg-black/30 transition-colors backdrop-blur-sm"
+        aria-label={isMuted ? "Unmute" : "Mute"}
       >
-        {isMuted ? <VolumeX size={20} className="text-white" /> : <Volume size={20} className="text-white" />}
+        {isMuted ? 
+          <VolumeX size={24} className="text-white" /> : 
+          <Volume size={24} className="text-white" />
+        }
       </button>
     </div>
   );
