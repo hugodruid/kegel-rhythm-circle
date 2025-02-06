@@ -3,12 +3,16 @@ import { cn } from "@/lib/utils";
 
 interface KegalTimerProps {
   isActive: boolean;
+  mode: 'normal' | 'fast';
   onComplete?: () => void;
 }
 
-export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
+export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
   const [isBreathingIn, setIsBreathingIn] = useState(true);
   const [seconds, setSeconds] = useState(0);
+  
+  const cycleDuration = mode === 'normal' ? 5 : 2; // Duration in seconds
+  const transitionMs = (cycleDuration * 1000) - 100; // Subtract 100ms to ensure smooth transitions
   
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -20,7 +24,7 @@ export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
       interval = setInterval(() => {
         setSeconds(prev => {
           const newSeconds = prev + 1;
-          if (newSeconds >= 5) {
+          if (newSeconds >= cycleDuration) {
             setIsBreathingIn(current => !current);
             return 0;
           }
@@ -37,7 +41,7 @@ export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
         clearInterval(interval);
       }
     };
-  }, [isActive]);
+  }, [isActive, cycleDuration]);
 
   return (
     <div className="relative w-80 h-80">
@@ -47,7 +51,7 @@ export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
       {/* Animated inner circle */}
       <div
         style={{
-          transition: isActive ? 'transform 4900ms ease-in-out' : 'none'
+          transition: isActive ? `transform ${transitionMs}ms ease-in-out` : 'none'
         }}
         className={cn(
           "absolute inset-4 rounded-full bg-[#9b87f5]",

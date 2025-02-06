@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { KegalTimer } from "@/components/KegalTimer";
 import { ExerciseControls } from "@/components/ExerciseControls";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+type TimerMode = 'normal' | 'fast';
 
 const Index = () => {
   const [isActive, setIsActive] = useState(false);
   const [time, setTime] = useState(0);
+  const [mode, setMode] = useState<TimerMode>('normal');
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -20,7 +24,6 @@ const Index = () => {
 
   const handleToggle = () => {
     if (!isActive) {
-      // Reset time when starting new session
       setTime(0);
       setIsActive(true);
     } else {
@@ -40,12 +43,29 @@ const Index = () => {
         Kegel Training
       </h1>
       
-      <div className="text-xl font-medium text-gray-600 mb-8">
+      <div className="text-xl font-medium text-gray-600 mb-4">
         Time: {formatTime(time)}
       </div>
+
+      {!isActive && (
+        <div className="mb-8">
+          <Select
+            value={mode}
+            onValueChange={(value: TimerMode) => setMode(value)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select mode" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="normal">Normal (5s)</SelectItem>
+              <SelectItem value="fast">Fast (2s)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
       
       <div className="flex flex-col items-center">
-        <KegalTimer isActive={isActive} />
+        <KegalTimer isActive={isActive} mode={mode} />
         <ExerciseControls
           isActive={isActive}
           onToggle={handleToggle}
