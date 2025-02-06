@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { KegalTimer } from "@/components/KegalTimer";
 import { ExerciseControls } from "@/components/ExerciseControls";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 type TimerMode = 'normal' | 'fast';
 
@@ -48,19 +48,13 @@ const Index = () => {
       </div>
 
       {!isActive && (
-        <div className="mb-8">
-          <Select
-            value={mode}
-            onValueChange={(value: TimerMode) => setMode(value)}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select mode" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="normal">Normal (5s)</SelectItem>
-              <SelectItem value="fast">Fast (2s)</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="mb-8 flex items-center gap-2">
+          <span className="text-sm text-gray-600">Normal</span>
+          <Switch
+            checked={mode === 'fast'}
+            onCheckedChange={(checked) => setMode(checked ? 'fast' : 'normal')}
+          />
+          <span className="text-sm text-gray-600">Fast</span>
         </div>
       )}
       
