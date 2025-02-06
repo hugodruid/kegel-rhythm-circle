@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { Volume, VolumeX } from "lucide-react";
@@ -137,12 +136,12 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
 
       <button 
         onClick={toggleMute}
-        className="absolute top-4 right-4 z-10 p-2.5 rounded-full bg-black/20 hover:bg-black/30 transition-colors backdrop-blur-sm"
+        className="absolute top-2 right-2 z-10 p-2 rounded-full bg-black/20 hover:bg-black/30 transition-colors backdrop-blur-sm flex items-center justify-center"
         aria-label={isMuted ? "Unmute" : "Mute"}
       >
         {isMuted ? 
-          <VolumeX size={24} className="text-white" /> : 
-          <Volume size={24} className="text-white" />
+          <VolumeX className="w-5 h-5 text-white" /> : 
+          <Volume className="w-5 h-5 text-white" />
         }
       </button>
     </div>
