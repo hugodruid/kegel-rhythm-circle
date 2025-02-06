@@ -25,7 +25,6 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
     inhaleSound.current = new Audio('/sounds/inhale.mp3');
     exhaleSound.current = new Audio('/sounds/exhale.mp3');
     
-    // Set up load handlers
     const handleInhaleLoaded = () => {
       console.log('Inhale sound loaded');
       checkSoundsLoaded();
@@ -46,7 +45,6 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
     inhaleSound.current.addEventListener('canplaythrough', handleInhaleLoaded);
     exhaleSound.current.addEventListener('canplaythrough', handleExhaleLoaded);
     
-    // Start loading the sounds
     inhaleSound.current.load();
     exhaleSound.current.load();
     
@@ -56,13 +54,23 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
     };
   }, []);
 
+  // Update audio volume when mute state changes
+  useEffect(() => {
+    if (inhaleSound.current) {
+      inhaleSound.current.volume = isMuted ? 0 : 1;
+    }
+    if (exhaleSound.current) {
+      exhaleSound.current.volume = isMuted ? 0 : 1;
+    }
+  }, [isMuted]);
+
   // Main timer effect
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
     if (isActive && soundsLoaded) {
       // Play inhale sound immediately when starting
-      if (inhaleSound.current && !isMuted) {
+      if (inhaleSound.current) {
         inhaleSound.current.currentTime = 0;
         inhaleSound.current.play().catch(error => {
           console.error('Error playing inhale sound:', error);
@@ -78,7 +86,7 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
             setIsBreathingIn(current => {
               // Play appropriate sound when changing state
               const soundToPlay = current ? exhaleSound.current : inhaleSound.current;
-              if (soundToPlay && !isMuted) {
+              if (soundToPlay) {
                 soundToPlay.currentTime = 0;
                 soundToPlay.play().catch(error => {
                   console.error('Error playing sound:', error);
@@ -101,7 +109,7 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
         clearInterval(interval);
       }
     };
-  }, [isActive, cycleDuration, soundsLoaded, isMuted]);
+  }, [isActive, cycleDuration, soundsLoaded]);
 
   const toggleMute = () => {
     setIsMuted(prev => !prev);
