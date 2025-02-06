@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 interface KegalTimerProps {
   isActive: boolean;
-  mode: 'normal' | 'fast';
+  mode: 'normal' | 'fast' | 'very-fast';
   onComplete?: () => void;
 }
 
@@ -11,7 +11,7 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
   const [isBreathingIn, setIsBreathingIn] = useState(true);
   const [seconds, setSeconds] = useState(0);
   
-  const cycleDuration = mode === 'normal' ? 5 : 2; // Duration in seconds
+  const cycleDuration = mode === 'normal' ? 5 : mode === 'fast' ? 2 : 1; // Duration in seconds
   const transitionMs = (cycleDuration * 1000) - 100; // Subtract 100ms to ensure smooth transitions
   
   useEffect(() => {
