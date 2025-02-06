@@ -10,8 +10,8 @@ interface KegalTimerProps {
 export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
   const [isBreathingIn, setIsBreathingIn] = useState(true);
   const [seconds, setSeconds] = useState(0);
-  const inhaleSound = useRef(new Audio('/sounds/inhale.mp3'));
-  const exhaleSound = useRef(new Audio('/sounds/exhale.mp3'));
+  const inhaleSound = useRef(new Audio('/Sounds/inhale.mp3'));
+  const exhaleSound = useRef(new Audio('/Sounds/exhale.mp3'));
   
   const cycleDuration = mode === 'normal' ? 5 : mode === 'fast' ? 2 : 1;
   const transitionMs = (cycleDuration * 1000) - 100;
