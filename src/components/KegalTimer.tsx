@@ -7,13 +7,15 @@ interface KegalTimerProps {
 }
 
 export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
-  const [isBreathingIn, setIsBreathingIn] = useState(false);
+  const [isBreathingIn, setIsBreathingIn] = useState(true);
   const [seconds, setSeconds] = useState(0);
   
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
     if (isActive) {
+      setIsBreathingIn(true); // Always start with breathing in
+      setSeconds(0);
       interval = setInterval(() => {
         setSeconds(prev => {
           if (prev >= 7) {
@@ -23,10 +25,13 @@ export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
           return prev + 1;
         });
       }, 1000);
+    } else {
+      setIsBreathingIn(true); // Reset to breathing in when stopped
+      setSeconds(0);
     }
 
     return () => clearInterval(interval);
-  }, [isActive, isBreathingIn]);
+  }, [isActive]);
 
   return (
     <div className="relative w-80 h-80">
