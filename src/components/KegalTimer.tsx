@@ -1,6 +1,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { cn } from "@/lib/utils";
+import { Volume, VolumeX } from "lucide-react";
 
 interface KegalTimerProps {
   isActive: boolean;
@@ -12,6 +13,7 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
   const [isBreathingIn, setIsBreathingIn] = useState(true);
   const [seconds, setSeconds] = useState(0);
   const [soundsLoaded, setSoundsLoaded] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const inhaleSound = useRef<HTMLAudioElement | null>(null);
   const exhaleSound = useRef<HTMLAudioElement | null>(null);
   
@@ -60,7 +62,7 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
     
     if (isActive && soundsLoaded) {
       // Play inhale sound immediately when starting
-      if (inhaleSound.current) {
+      if (inhaleSound.current && !isMuted) {
         inhaleSound.current.currentTime = 0;
         inhaleSound.current.play().catch(error => {
           console.error('Error playing inhale sound:', error);
@@ -76,7 +78,7 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
             setIsBreathingIn(current => {
               // Play appropriate sound when changing state
               const soundToPlay = current ? exhaleSound.current : inhaleSound.current;
-              if (soundToPlay) {
+              if (soundToPlay && !isMuted) {
                 soundToPlay.currentTime = 0;
                 soundToPlay.play().catch(error => {
                   console.error('Error playing sound:', error);
@@ -99,7 +101,11 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
         clearInterval(interval);
       }
     };
-  }, [isActive, cycleDuration, soundsLoaded]);
+  }, [isActive, cycleDuration, soundsLoaded, isMuted]);
+
+  const toggleMute = () => {
+    setIsMuted(prev => !prev);
+  };
 
   return (
     <div className="relative w-80 h-80">
@@ -120,6 +126,13 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
           {isBreathingIn ? "Inhale & Squeeze" : "Exhale & Release"}
         </p>
       </div>
+
+      <button 
+        onClick={toggleMute}
+        className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+      >
+        {isMuted ? <VolumeX size={20} className="text-white" /> : <Volume size={20} className="text-white" />}
+      </button>
     </div>
   );
 };
