@@ -48,7 +48,7 @@ export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
       <div
         className={cn(
           "absolute inset-4 rounded-full bg-[#9b87f5] transition-all duration-[4900ms] ease-in-out",
-          isActive ? (isBreathingIn ? "scale-[0.6]" : "scale-110") : "scale-110"
+          isActive ? (isBreathingIn ? "scale-110" : "scale-[0.6]") : "scale-[0.6]"
         )}
       />
       
