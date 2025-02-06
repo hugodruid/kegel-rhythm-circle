@@ -46,11 +46,12 @@ export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
       
       {/* Animated inner circle */}
       <div
+        style={{
+          transition: isActive ? 'transform 4900ms ease-in-out' : 'none'
+        }}
         className={cn(
           "absolute inset-4 rounded-full bg-[#9b87f5]",
-          isActive 
-            ? `transform transition-transform duration-[4900ms] ease-in-out ${isBreathingIn ? "scale-110" : "scale-[0.6]"}`
-            : "scale-[0.6]"
+          isActive ? (isBreathingIn ? "scale-110" : "scale-[0.6]") : "scale-[0.6]"
         )}
       />
       
