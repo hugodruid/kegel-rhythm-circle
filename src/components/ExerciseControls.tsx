@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Play, Stop } from "lucide-react";
+import { Play, Square } from "lucide-react";
 
 interface ExerciseControlsProps {
   isActive: boolean;
@@ -15,7 +15,7 @@ export const ExerciseControls = ({ isActive, onToggle }: ExerciseControlsProps) 
       >
         {isActive ? (
           <>
-            <Stop className="mr-2 h-4 w-4" /> Stop
+            <Square className="mr-2 h-4 w-4" /> Stop
           </>
         ) : (
           <>
