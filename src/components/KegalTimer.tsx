@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { cn } from "@/lib/utils";
 
 interface KegalTimerProps {
@@ -10,9 +10,11 @@ interface KegalTimerProps {
 export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
   const [isBreathingIn, setIsBreathingIn] = useState(true);
   const [seconds, setSeconds] = useState(0);
+  const inhaleSound = useRef(new Audio('/sounds/inhale.mp3'));
+  const exhaleSound = useRef(new Audio('/sounds/exhale.mp3'));
   
-  const cycleDuration = mode === 'normal' ? 5 : mode === 'fast' ? 2 : 1; // Duration in seconds
-  const transitionMs = (cycleDuration * 1000) - 100; // Subtract 100ms to ensure smooth transitions
+  const cycleDuration = mode === 'normal' ? 5 : mode === 'fast' ? 2 : 1;
+  const transitionMs = (cycleDuration * 1000) - 100;
   
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -25,7 +27,15 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
         setSeconds(prev => {
           const newSeconds = prev + 1;
           if (newSeconds >= cycleDuration) {
-            setIsBreathingIn(current => !current);
+            setIsBreathingIn(current => {
+              // Play sound when changing state
+              if (current) {
+                exhaleSound.current.play().catch(console.error);
+              } else {
+                inhaleSound.current.play().catch(console.error);
+              }
+              return !current;
+            });
             return 0;
           }
           return newSeconds;
@@ -43,12 +53,16 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
     };
   }, [isActive, cycleDuration]);
 
+  // Preload sounds
+  useEffect(() => {
+    inhaleSound.current.load();
+    exhaleSound.current.load();
+  }, []);
+
   return (
     <div className="relative w-80 h-80">
-      {/* Outer static circle */}
       <div className="absolute inset-0 rounded-full bg-[#D3E4FD]" />
       
-      {/* Animated inner circle */}
       <div
         style={{
           transition: isActive ? `transform ${transitionMs}ms ease-in-out` : 'none'
@@ -59,7 +73,6 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
         )}
       />
       
-      {/* Text overlay */}
       <div className="absolute inset-0 flex items-center justify-center">
         <p className="text-2xl font-medium text-white">
           {isBreathingIn ? "Inhale & Squeeze" : "Exhale & Release"}
