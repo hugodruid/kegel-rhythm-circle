@@ -103,7 +103,7 @@ const Index = () => {
       </div>
       
       <p className="mt-8 text-gray-600 max-w-md text-center">
-        Synchronize your breathing with the circle's movement. 
+        Synchronize your breathing and your pelvic floor contractions with the circle's movement. 
         Inhale and squeeze as it expands, exhale and release as it contracts.
       </p>
     </div>
