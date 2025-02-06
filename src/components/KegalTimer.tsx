@@ -18,7 +18,7 @@ export const KegalTimer = ({ isActive, onComplete }: KegalTimerProps) => {
       setSeconds(0);
       interval = setInterval(() => {
         setSeconds(prev => {
-          if (prev >= 7) {
+          if (prev >= 5) { // Changed from 7 to 5 seconds
             setIsBreathingIn(current => !current);
             return 0;
           }
