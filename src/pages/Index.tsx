@@ -6,11 +6,12 @@ const Index = () => {
   const [isActive, setIsActive] = useState(false);
 
   const handleToggle = () => {
-    setIsActive(!isActive);
-  };
-
-  const handleReset = () => {
-    setIsActive(false);
+    if (!isActive) {
+      // Reset happens automatically when starting
+      setIsActive(true);
+    } else {
+      setIsActive(false);
+    }
   };
 
   return (
@@ -24,7 +25,6 @@ const Index = () => {
         <ExerciseControls
           isActive={isActive}
           onToggle={handleToggle}
-          onReset={handleReset}
         />
       </div>
       
