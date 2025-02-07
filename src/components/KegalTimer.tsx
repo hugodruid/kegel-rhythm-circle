@@ -14,10 +14,11 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
   const [seconds, setSeconds] = useState(0);
   const [soundsLoaded, setSoundsLoaded] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  
   const inhaleSound = useRef<HTMLAudioElement | null>(null);
   const exhaleSound = useRef<HTMLAudioElement | null>(null);
   const currentSound = useRef<HTMLAudioElement | null>(null);
-  const isInitialized = useRef(false);
+  const shouldPlayNextSound = useRef(true);
   
   const cycleDuration = mode === 'normal' ? 5 : mode === 'fast' ? 2 : 1;
   const transitionMs = (cycleDuration * 1000) - 100;
@@ -64,40 +65,41 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
     };
   }, []);
 
-  // Handle sound playing
-  const playSound = (sound: HTMLAudioElement | null) => {
-    if (sound && !isMuted && soundsLoaded) {
-      if (currentSound.current) {
-        currentSound.current.pause();
-        currentSound.current.currentTime = 0;
-      }
-      currentSound.current = sound;
-      sound.currentTime = 0;
-      sound.volume = 1;
-      sound.play().catch(error => {
-        console.error('Error playing sound:', error);
-      });
-    }
-  };
-
-  // Handle mute state changes - only affects volume
+  // Separate sound control effect
   useEffect(() => {
     if (currentSound.current) {
       currentSound.current.volume = isMuted ? 0 : 1;
     }
+    shouldPlayNextSound.current = !isMuted;
   }, [isMuted]);
 
-  // Main timer effect - handles animation and sound independently
+  // Handle sound playing
+  const playSound = (sound: HTMLAudioElement | null) => {
+    if (!sound || !soundsLoaded || !shouldPlayNextSound.current) return;
+    
+    if (currentSound.current) {
+      currentSound.current.pause();
+      currentSound.current.currentTime = 0;
+    }
+    
+    currentSound.current = sound;
+    sound.currentTime = 0;
+    sound.volume = isMuted ? 0 : 1;
+    sound.play().catch(error => {
+      console.error('Error playing sound:', error);
+    });
+  };
+
+  // Main animation timer effect - completely independent of sound state
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
     if (isActive && soundsLoaded) {
-      // Only play initial sound if this is the first activation and not muted
-      if (!isInitialized.current && !isMuted) {
+      // Play initial inhale sound only if it's the first activation
+      if (!isMuted) {
         playSound(inhaleSound.current);
       }
       
-      isInitialized.current = true;
       setIsBreathingIn(true);
       setSeconds(0);
       
@@ -105,21 +107,13 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
         setSeconds(prev => {
           const newSeconds = prev + 1;
           if (newSeconds >= cycleDuration) {
-            setIsBreathingIn(current => {
-              // Only play transition sounds if not muted
-              if (!isMuted) {
-                const nextSound = current ? exhaleSound.current : inhaleSound.current;
-                playSound(nextSound);
-              }
-              return !current;
-            });
+            setIsBreathingIn(current => !current);
             return 0;
           }
           return newSeconds;
         });
       }, 1000);
     } else {
-      isInitialized.current = false;
       setIsBreathingIn(true);
       setSeconds(0);
     }
@@ -128,12 +122,16 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
       if (interval) {
         clearInterval(interval);
       }
-      if (currentSound.current) {
-        currentSound.current.pause();
-        currentSound.current.currentTime = 0;
-      }
     };
-  }, [isActive, cycleDuration, soundsLoaded, isMuted]);
+  }, [isActive, cycleDuration, soundsLoaded]); // Removed isMuted dependency
+
+  // Separate effect for sound playback based on breathing state changes
+  useEffect(() => {
+    if (isActive && soundsLoaded && seconds === 0) {
+      const nextSound = isBreathingIn ? inhaleSound.current : exhaleSound.current;
+      playSound(nextSound);
+    }
+  }, [isBreathingIn, seconds, isActive, soundsLoaded]);
 
   const toggleMute = () => {
     setIsMuted(prev => !prev);
