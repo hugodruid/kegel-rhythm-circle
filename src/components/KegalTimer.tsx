@@ -17,6 +17,7 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
   const inhaleSound = useRef<HTMLAudioElement | null>(null);
   const exhaleSound = useRef<HTMLAudioElement | null>(null);
   const currentSound = useRef<HTMLAudioElement | null>(null);
+  const isInitialized = useRef(false);
   
   const cycleDuration = mode === 'normal' ? 5 : mode === 'fast' ? 2 : 1;
   const transitionMs = (cycleDuration * 1000) - 100;
@@ -63,9 +64,24 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
     };
   }, []);
 
-  // Handle mute state changes
+  // Handle sound playing
+  const playSound = (sound: HTMLAudioElement | null) => {
+    if (sound && !isMuted && soundsLoaded) {
+      if (currentSound.current) {
+        currentSound.current.pause();
+        currentSound.current.currentTime = 0;
+      }
+      currentSound.current = sound;
+      sound.currentTime = 0;
+      sound.volume = 1;
+      sound.play().catch(error => {
+        console.error('Error playing sound:', error);
+      });
+    }
+  };
+
+  // Handle mute state changes - only affects volume
   useEffect(() => {
-    // When muting, only adjust volume of currently playing sound
     if (currentSound.current) {
       currentSound.current.volume = isMuted ? 0 : 1;
     }
@@ -76,26 +92,12 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
     let interval: NodeJS.Timeout;
     
     if (isActive && soundsLoaded) {
-      const playSound = (sound: HTMLAudioElement | null) => {
-        if (sound && !isMuted) {
-          if (currentSound.current) {
-            currentSound.current.pause();
-            currentSound.current.currentTime = 0;
-          }
-          currentSound.current = sound;
-          sound.currentTime = 0;
-          sound.volume = 1;
-          sound.play().catch(error => {
-            console.error('Error playing sound:', error);
-          });
-        }
-      };
-
-      // Only play initial sound if not muted
-      if (!isMuted) {
+      // Only play initial sound if this is the first activation and not muted
+      if (!isInitialized.current && !isMuted) {
         playSound(inhaleSound.current);
       }
       
+      isInitialized.current = true;
       setIsBreathingIn(true);
       setSeconds(0);
       
@@ -103,9 +105,8 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
         setSeconds(prev => {
           const newSeconds = prev + 1;
           if (newSeconds >= cycleDuration) {
-            // Animation state update
             setIsBreathingIn(current => {
-              // Only play sound if not muted
+              // Only play transition sounds if not muted
               if (!isMuted) {
                 const nextSound = current ? exhaleSound.current : inhaleSound.current;
                 playSound(nextSound);
@@ -118,6 +119,7 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
         });
       }, 1000);
     } else {
+      isInitialized.current = false;
       setIsBreathingIn(true);
       setSeconds(0);
     }
