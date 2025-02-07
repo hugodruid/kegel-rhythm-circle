@@ -46,12 +46,10 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
     inhaleSound.current.addEventListener('canplaythrough', handleInhaleLoaded);
     exhaleSound.current.addEventListener('canplaythrough', handleExhaleLoaded);
     
-    // Preload the sounds
     inhaleSound.current.load();
     exhaleSound.current.load();
     
     return () => {
-      // Cleanup audio elements
       if (inhaleSound.current) {
         inhaleSound.current.removeEventListener('canplaythrough', handleInhaleLoaded);
         inhaleSound.current.pause();
@@ -65,51 +63,39 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
     };
   }, []);
 
-  // Update audio volume and stop playback when muted
+  // Handle mute state changes
   useEffect(() => {
-    const stopAndResetAudio = (audio: HTMLAudioElement | null) => {
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
-        audio.volume = isMuted ? 0 : 1;
-      }
-    };
-
-    if (isMuted && currentSound.current) {
-      stopAndResetAudio(currentSound.current);
+    // When muting, only adjust volume of currently playing sound
+    if (currentSound.current) {
+      currentSound.current.volume = isMuted ? 0 : 1;
     }
-
-    stopAndResetAudio(inhaleSound.current);
-    stopAndResetAudio(exhaleSound.current);
   }, [isMuted]);
 
-  // Main timer effect
+  // Main timer effect - handles animation and sound independently
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
     if (isActive && soundsLoaded) {
       const playSound = (sound: HTMLAudioElement | null) => {
         if (sound && !isMuted) {
-          // Stop any currently playing sound
           if (currentSound.current) {
             currentSound.current.pause();
             currentSound.current.currentTime = 0;
           }
-          // Set and play the new sound
           currentSound.current = sound;
           sound.currentTime = 0;
-          sound.volume = isMuted ? 0 : 1;
-          const playPromise = sound.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(error => {
-              console.error('Error playing sound:', error);
-            });
-          }
+          sound.volume = 1;
+          sound.play().catch(error => {
+            console.error('Error playing sound:', error);
+          });
         }
       };
 
-      // Play inhale sound immediately when starting
-      playSound(inhaleSound.current);
+      // Only play initial sound if not muted
+      if (!isMuted) {
+        playSound(inhaleSound.current);
+      }
+      
       setIsBreathingIn(true);
       setSeconds(0);
       
@@ -117,9 +103,13 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
         setSeconds(prev => {
           const newSeconds = prev + 1;
           if (newSeconds >= cycleDuration) {
+            // Animation state update
             setIsBreathingIn(current => {
-              // Play appropriate sound when changing state
-              playSound(current ? exhaleSound.current : inhaleSound.current);
+              // Only play sound if not muted
+              if (!isMuted) {
+                const nextSound = current ? exhaleSound.current : inhaleSound.current;
+                playSound(nextSound);
+              }
               return !current;
             });
             return 0;
@@ -136,7 +126,6 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
       if (interval) {
         clearInterval(interval);
       }
-      // Stop any playing sound when cleaning up
       if (currentSound.current) {
         currentSound.current.pause();
         currentSound.current.currentTime = 0;
@@ -170,7 +159,7 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
 
       <button 
         onClick={toggleMute}
-        className="absolute top-2 right-2 z-10 p-2 rounded-full bg-black/20 hover:bg-black/30 transition-colors backdrop-blur-sm flex items-center justify-center"
+        className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/20 hover:bg-black/30 transition-colors backdrop-blur-sm flex items-center justify-center"
         aria-label={isMuted ? "Unmute" : "Mute"}
       >
         {isMuted ? 
