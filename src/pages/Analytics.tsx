@@ -43,7 +43,15 @@ const Analytics = () => {
 
       if (error) throw error;
 
-      setSessions(data || []);
+      // Type assertion to ensure the mode is one of the allowed values
+      const typedSessions = (data || []).map(session => ({
+        id: session.id,
+        started_at: session.started_at,
+        duration_seconds: session.duration_seconds,
+        mode: session.mode as 'normal' | 'fast' | 'very-fast'
+      }));
+
+      setSessions(typedSessions);
     } catch (error: any) {
       toast({
         title: "Error fetching sessions",
