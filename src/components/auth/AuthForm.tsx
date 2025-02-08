@@ -19,24 +19,27 @@ export const AuthForm = () => {
 
     try {
       if (isSignUp) {
-        const { error: signUpError } = await supabase.auth.signUp({
+        // Sign up the user
+        const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
-          options: {
-            data: {
-              username,
-            },
-          },
         });
 
         if (signUpError) throw signUpError;
 
-        // Insert into profiles table
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .insert([{ id: (await supabase.auth.getUser()).data.user?.id, username }]);
+        // Create profile only after successful signup
+        if (authData.user) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert([
+              {
+                id: authData.user.id,
+                username,
+              }
+            ]);
 
-        if (profileError) throw profileError;
+          if (profileError) throw profileError;
+        }
 
         toast({
           title: "Account created",
