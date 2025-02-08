@@ -23,19 +23,39 @@ export default function Settings() {
 
   // Load initial user data
   const loadUserData = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      setEmail(user.email || "");
-      // Fetch profile data
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('id', user.id)
-        .single();
-      
-      if (profile) {
-        setUsername(profile.username || "");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setEmail(user.email || "");
+        
+        // Fetch profile data
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', user.id)
+          .maybeSingle();
+        
+        if (error) throw error;
+
+        // If no profile exists, create one
+        if (!profile) {
+          const { error: createError } = await supabase
+            .from('profiles')
+            .insert([{ id: user.id, username: user.email?.split('@')[0] || 'user' }]);
+          
+          if (createError) throw createError;
+          
+          setUsername(user.email?.split('@')[0] || 'user');
+        } else {
+          setUsername(profile.username || "");
+        }
       }
+    } catch (error: any) {
+      toast({
+        title: "Error loading profile",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
