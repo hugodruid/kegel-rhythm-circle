@@ -30,22 +30,22 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <SidebarProvider defaultOpen={false}>
-      <div className="relative min-h-screen">
-        <Sidebar side="left" className="pt-16">
-          <SidebarHeader className="flex justify-between items-center">
+      <div className="relative flex min-h-screen w-full">
+        <Sidebar className="border-r">
+          <SidebarHeader className="flex justify-between items-center px-4 py-2">
             <h2 className="text-lg font-semibold">Menu</h2>
             <SidebarTrigger />
           </SidebarHeader>
-          <SidebarContent>
+          <SidebarContent className="px-4">
             {!user ? <AuthForm /> : <UserMenu />}
           </SidebarContent>
-          <SidebarFooter>
-            <p className="text-xs text-sidebar-foreground/50 text-center">
+          <SidebarFooter className="px-4 py-2">
+            <p className="text-xs text-muted-foreground text-center">
               © 2024 Kegel Trainer
             </p>
           </SidebarFooter>
         </Sidebar>
-        <main className="flex-1">
+        <main className="flex-1 p-4">
           {children}
         </main>
       </div>
