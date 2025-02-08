@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { UserMenu } from "@/components/auth/UserMenu";
-import { Home, Menu, Settings } from "lucide-react";
+import { BarChart3, Home, Menu, Settings } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import {
@@ -40,11 +40,18 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       path: "/",
       icon: Home,
     },
-    {
-      title: "Settings",
-      path: "/settings",
-      icon: Settings,
-    },
+    ...(user ? [
+      {
+        title: "Analytics",
+        path: "/analytics",
+        icon: BarChart3,
+      },
+      {
+        title: "Settings",
+        path: "/settings",
+        icon: Settings,
+      },
+    ] : []),
   ];
 
   return (
