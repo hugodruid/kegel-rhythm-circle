@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,7 +40,7 @@ export default function Settings() {
   };
 
   // Load user data on component mount
-  useState(() => {
+  useEffect(() => {
     loadUserData();
   }, []);
 
