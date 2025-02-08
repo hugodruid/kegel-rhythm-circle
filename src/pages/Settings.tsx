@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { Navigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -19,7 +19,17 @@ export default function Settings() {
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const { toast } = useToast();
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
+    };
+    checkAuth();
+  }, []);
 
   // Load initial user data
   const loadUserData = async () => {
@@ -61,8 +71,10 @@ export default function Settings() {
 
   // Load user data on component mount
   useEffect(() => {
-    loadUserData();
-  }, []);
+    if (isAuthenticated) {
+      loadUserData();
+    }
+  }, [isAuthenticated]);
 
   const updateUsername = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,6 +156,16 @@ export default function Settings() {
       setIsLoading(false);
     }
   };
+
+  // If authentication status is still being checked, show nothing
+  if (isAuthenticated === null) {
+    return null;
+  }
+
+  // If not authenticated, redirect to root
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="container max-w-2xl mx-auto py-8">
