@@ -4,9 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { Calendar as DayPicker } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { Trash2, Plus } from "lucide-react";
 
 interface EjaculationEvent {
   id: string;
@@ -90,7 +92,7 @@ const Calendar = () => {
   };
 
   // Delete event
-  const deleteEvent = async (date: Date) => {
+  const deleteEvent = async (eventId: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -101,14 +103,14 @@ const Calendar = () => {
       const { error } = await supabase
         .from('ejaculation_events')
         .delete()
-        .eq('occurred_at', date.toISOString())
+        .eq('id', eventId)
         .eq('user_id', user.id);
 
       if (error) throw error;
 
       toast({
         title: "Event deleted",
-        description: `Event removed for ${format(date, 'PPP')}`,
+        description: "Event successfully removed",
       });
 
       fetchEvents();
@@ -125,14 +127,63 @@ const Calendar = () => {
     if (!day) return;
     
     setSelectedDay(day);
-    const dayStr = day.toISOString();
-    const existingEvent = events.find(e => e.occurred_at.startsWith(dayStr.split('T')[0]));
+    const dayStr = day.toISOString().split('T')[0];
+    const existingEvents = events.filter(e => e.occurred_at.startsWith(dayStr));
     
-    if (existingEvent) {
-      deleteEvent(day);
-    } else {
+    if (existingEvents.length === 0) {
       addEvent(day);
     }
+  };
+
+  const getDayContent = (day: Date) => {
+    const dayStr = day.toISOString().split('T')[0];
+    const dayEvents = events.filter(e => e.occurred_at.startsWith(dayStr));
+    
+    if (dayEvents.length === 0) return null;
+
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="relative">
+              💦
+              {dayEvents.length > 1 && (
+                <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                  {dayEvents.length}
+                </span>
+              )}
+            </div>
+          </div>
+        </PopoverTrigger>
+        <PopoverContent className="w-80">
+          <div className="space-y-4">
+            <div className="font-medium">{format(day, 'PPP')}</div>
+            <div className="space-y-2">
+              {dayEvents.map((event) => (
+                <div key={event.id} className="flex items-center justify-between bg-secondary p-2 rounded">
+                  <span>{format(new Date(event.occurred_at), 'p')}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => deleteEvent(event.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <Button
+              onClick={() => addEvent(day)}
+              className="w-full"
+              variant="outline"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Another Event
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
+    );
   };
 
   if (isLoading) {
@@ -165,9 +216,12 @@ const Calendar = () => {
               onSelect={handleDayClick}
               modifiers={modifiers}
               modifiersStyles={modifiersStyles}
+              components={{
+                DayContent: ({ date }) => getDayContent(date)
+              }}
               footer={
                 <div className="mt-4 text-center text-sm text-gray-500">
-                  Click on a date to toggle 💦
+                  Click on a date to add event 💦
                 </div>
               }
             />
