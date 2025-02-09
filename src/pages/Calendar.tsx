@@ -138,20 +138,33 @@ const Calendar = () => {
   const getDayContent = (day: Date) => {
     const dayStr = day.toISOString().split('T')[0];
     const dayEvents = events.filter(e => e.occurred_at.startsWith(dayStr));
+    const dateNumber = day.getDate();
     
-    if (dayEvents.length === 0) return null;
+    if (dayEvents.length === 0) {
+      return (
+        <div className="text-black font-medium">
+          {dateNumber}
+        </div>
+      );
+    }
 
     return (
       <Popover>
         <PopoverTrigger asChild>
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="relative">
-              💦
-              {dayEvents.length > 1 && (
-                <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                  {dayEvents.length}
-                </span>
-              )}
+          <div className="w-full h-full flex items-center justify-center relative">
+            <div className="absolute w-full h-full flex items-center justify-center">
+              <span className="text-black/30">{dateNumber}</span>
+            </div>
+            <div className="relative bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center">
+              <span className="text-white/90">{dateNumber}</span>
+              <div className="absolute inset-0 flex items-center justify-center">
+                💦
+                {dayEvents.length > 1 && (
+                  <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    {dayEvents.length}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </PopoverTrigger>
