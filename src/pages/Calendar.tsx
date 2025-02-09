@@ -108,12 +108,13 @@ const Calendar = () => {
 
       if (error) throw error;
 
+      // Update local state immediately after successful deletion
+      setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
+
       toast({
         title: "Event deleted",
         description: "Event successfully removed",
       });
-
-      fetchEvents();
     } catch (error: any) {
       toast({
         title: "Error deleting event",
