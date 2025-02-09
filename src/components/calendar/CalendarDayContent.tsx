@@ -23,35 +23,35 @@ export const CalendarDayContent = ({
 }: CalendarDayContentProps) => {
   const dateNumber = date.getDate();
 
-  if (events.length === 0) {
-    return (
-      <div className="text-black font-medium">
-        {dateNumber}
-      </div>
-    );
-  }
-
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <div className="w-full h-full flex items-center justify-center relative cursor-pointer">
-          <div className="absolute w-full h-full flex items-center justify-center">
-            <span className="text-black/30">{dateNumber}</span>
-          </div>
-          <div className="relative bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center">
-            <span className="text-white/90">{dateNumber}</span>
-            <div className="absolute inset-0 flex items-center justify-center">
-              💦
-              {events.length > 1 && (
-                <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                  {events.length}
-                </span>
-              )}
+        <Button
+          variant="ghost"
+          className="w-full h-full p-0 hover:bg-transparent data-[state=open]:bg-accent rounded-none"
+        >
+          {events.length === 0 ? (
+            <div className="text-black font-medium">
+              {dateNumber}
             </div>
-          </div>
-        </div>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center relative">
+              <div className="relative bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center">
+                <span className="text-white/90">{dateNumber}</span>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  💦
+                  {events.length > 1 && (
+                    <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                      {events.length}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-80 z-50">
         <div className="space-y-4">
           <div className="font-medium">{format(date, 'PPP')}</div>
           <div className="space-y-2">
