@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar as DayPicker } from "@/components/ui/calendar";
@@ -67,7 +68,7 @@ const Calendar = () => {
         return;
       }
 
-      // Set time to 12:00 PM for past dates, current time for today
+      // Set time to 12:00 (noon) for past dates, current time for today
       let eventTime = date;
       if (!isToday(date)) {
         eventTime = set(date, { hours: 12, minutes: 0, seconds: 0, milliseconds: 0 });
