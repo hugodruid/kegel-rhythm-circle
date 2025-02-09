@@ -8,6 +8,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
+import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/calendar" element={<Calendar />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AppLayout>
