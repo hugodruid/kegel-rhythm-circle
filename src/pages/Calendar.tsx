@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Calendar as DayPicker } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -149,9 +149,9 @@ const Calendar = () => {
     }
 
     return (
-      <Popover>
-        <PopoverTrigger asChild>
-          <div className="w-full h-full flex items-center justify-center relative">
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <div className="w-full h-full flex items-center justify-center relative cursor-pointer">
             <div className="absolute w-full h-full flex items-center justify-center">
               <span className="text-black/30">{dateNumber}</span>
             </div>
@@ -167,8 +167,8 @@ const Calendar = () => {
               </div>
             </div>
           </div>
-        </PopoverTrigger>
-        <PopoverContent className="w-80">
+        </HoverCardTrigger>
+        <HoverCardContent className="w-80">
           <div className="space-y-4">
             <div className="font-medium">{format(day, 'PPP')}</div>
             <div className="space-y-2">
@@ -194,8 +194,8 @@ const Calendar = () => {
               Add Another Event
             </Button>
           </div>
-        </PopoverContent>
-      </Popover>
+        </HoverCardContent>
+      </HoverCard>
     );
   };
 
