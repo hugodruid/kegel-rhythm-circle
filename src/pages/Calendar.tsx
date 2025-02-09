@@ -109,7 +109,11 @@ const Calendar = () => {
       if (error) throw error;
 
       // Update local state immediately after successful deletion
-      setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
+      setEvents(prevEvents => {
+        const updatedEvents = prevEvents.filter(event => event.id !== eventId);
+        // Force a re-render by creating a new array
+        return [...updatedEvents];
+      });
 
       toast({
         title: "Event deleted",
