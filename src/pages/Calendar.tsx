@@ -59,10 +59,17 @@ const Calendar = () => {
   // Add new event
   const addEvent = async (date: Date) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/');
+        return;
+      }
+
       const { error } = await supabase
         .from('ejaculation_events')
         .insert({
           occurred_at: date.toISOString(),
+          user_id: user.id
         });
 
       if (error) throw error;
@@ -85,10 +92,17 @@ const Calendar = () => {
   // Delete event
   const deleteEvent = async (date: Date) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/');
+        return;
+      }
+
       const { error } = await supabase
         .from('ejaculation_events')
         .delete()
-        .eq('occurred_at', date.toISOString());
+        .eq('occurred_at', date.toISOString())
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
