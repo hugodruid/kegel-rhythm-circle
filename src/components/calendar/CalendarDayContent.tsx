@@ -1,5 +1,5 @@
 
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Clock, Plus, Trash2 } from "lucide-react";
@@ -32,8 +32,8 @@ export const CalendarDayContent = ({
   }
 
   return (
-    <HoverCard>
-      <HoverCardTrigger asChild>
+    <Popover>
+      <PopoverTrigger asChild>
         <div className="w-full h-full flex items-center justify-center relative cursor-pointer">
           <div className="absolute w-full h-full flex items-center justify-center">
             <span className="text-black/30">{dateNumber}</span>
@@ -50,8 +50,8 @@ export const CalendarDayContent = ({
             </div>
           </div>
         </div>
-      </HoverCardTrigger>
-      <HoverCardContent className="w-80">
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
         <div className="space-y-4">
           <div className="font-medium">{format(date, 'PPP')}</div>
           <div className="space-y-2">
@@ -85,7 +85,7 @@ export const CalendarDayContent = ({
             Add Another Event
           </Button>
         </div>
-      </HoverCardContent>
-    </HoverCard>
+      </PopoverContent>
+    </Popover>
   );
 };
