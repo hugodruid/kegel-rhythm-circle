@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar as DayPicker } from "@/components/ui/calendar";
@@ -46,7 +47,13 @@ const Calendar = () => {
 
       if (error) throw error;
 
-      setEvents(data || []);
+      // Convert UTC dates to local timezone
+      const localEvents = data?.map(event => ({
+        ...event,
+        occurred_at: new Date(event.occurred_at).toISOString()
+      })) || [];
+
+      setEvents(localEvents);
     } catch (error: any) {
       toast({
         title: "Error fetching events",
@@ -67,7 +74,7 @@ const Calendar = () => {
         return;
       }
 
-      // Start with the beginning of the selected day to avoid timezone issues
+      // Get the start of the selected day in local timezone
       const baseDate = startOfDay(date);
       
       // Set time to 12:00 (noon) for past dates, current time for today
@@ -120,6 +127,7 @@ const Calendar = () => {
       const event = events.find(e => e.id === eventId);
       if (!event) return;
 
+      // Convert to local timezone for manipulation
       const currentDate = new Date(event.occurred_at);
       const [hours, minutes] = newTime.split(':');
       const updatedDate = set(currentDate, {
@@ -137,7 +145,6 @@ const Calendar = () => {
 
       if (error) throw error;
 
-      // Update local state
       setEvents(prevEvents => {
         const updatedEvents = prevEvents.map(event => 
           event.id === eventId 
@@ -177,10 +184,8 @@ const Calendar = () => {
 
       if (error) throw error;
 
-      // Update local state immediately after successful deletion
       setEvents(prevEvents => {
         const updatedEvents = prevEvents.filter(event => event.id !== eventId);
-        // Force a re-render by creating a new array
         return [...updatedEvents];
       });
 
