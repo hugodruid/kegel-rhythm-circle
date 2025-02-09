@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar as DayPicker } from "@/components/ui/calendar";
@@ -7,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
-import { Trash2, Plus } from "lucide-react";
+import { format, isToday, set } from "date-fns";
+import { Trash2, Plus, Clock } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface EjaculationEvent {
   id: string;
@@ -67,10 +67,16 @@ const Calendar = () => {
         return;
       }
 
+      // Set time to 12:00 PM for past dates, current time for today
+      let eventTime = date;
+      if (!isToday(date)) {
+        eventTime = set(date, { hours: 12, minutes: 0, seconds: 0, milliseconds: 0 });
+      }
+
       const { error } = await supabase
         .from('ejaculation_events')
         .insert({
-          occurred_at: date.toISOString(),
+          occurred_at: eventTime.toISOString(),
           user_id: user.id
         });
 
@@ -85,6 +91,58 @@ const Calendar = () => {
     } catch (error: any) {
       toast({
         title: "Error adding event",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Update event time
+  const updateEventTime = async (eventId: string, newTime: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/');
+        return;
+      }
+
+      const event = events.find(e => e.id === eventId);
+      if (!event) return;
+
+      const currentDate = new Date(event.occurred_at);
+      const [hours, minutes] = newTime.split(':');
+      const updatedDate = set(currentDate, {
+        hours: parseInt(hours),
+        minutes: parseInt(minutes),
+        seconds: 0,
+        milliseconds: 0
+      });
+
+      const { error } = await supabase
+        .from('ejaculation_events')
+        .update({ occurred_at: updatedDate.toISOString() })
+        .eq('id', eventId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setEvents(prevEvents => {
+        const updatedEvents = prevEvents.map(event => 
+          event.id === eventId 
+            ? { ...event, occurred_at: updatedDate.toISOString() }
+            : event
+        );
+        return [...updatedEvents];
+      });
+
+      toast({
+        title: "Event updated",
+        description: "Time successfully updated",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error updating event",
         description: error.message,
         variant: "destructive",
       });
@@ -179,7 +237,15 @@ const Calendar = () => {
             <div className="space-y-2">
               {dayEvents.map((event) => (
                 <div key={event.id} className="flex items-center justify-between bg-secondary p-2 rounded">
-                  <span>{format(new Date(event.occurred_at), 'p')}</span>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    <Input
+                      type="time"
+                      defaultValue={format(new Date(event.occurred_at), 'HH:mm')}
+                      className="w-24"
+                      onChange={(e) => updateEventTime(event.id, e.target.value)}
+                    />
+                  </div>
                   <Button
                     variant="ghost"
                     size="icon"
