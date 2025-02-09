@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar as DayPicker } from "@/components/ui/calendar";
@@ -7,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { format, isToday, set } from "date-fns";
+import { format, isToday, set, startOfDay } from "date-fns";
 import { Trash2, Plus, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -68,10 +67,21 @@ const Calendar = () => {
         return;
       }
 
+      // Start with the beginning of the selected day to avoid timezone issues
+      const baseDate = startOfDay(date);
+      
       // Set time to 12:00 (noon) for past dates, current time for today
-      let eventTime = date;
+      let eventTime: Date;
       if (!isToday(date)) {
-        eventTime = set(date, { hours: 12, minutes: 0, seconds: 0, milliseconds: 0 });
+        eventTime = set(baseDate, { hours: 12, minutes: 0, seconds: 0, milliseconds: 0 });
+      } else {
+        const now = new Date();
+        eventTime = set(baseDate, {
+          hours: now.getHours(),
+          minutes: now.getMinutes(),
+          seconds: 0,
+          milliseconds: 0
+        });
       }
 
       const { error } = await supabase
@@ -191,8 +201,11 @@ const Calendar = () => {
     if (!day) return;
     
     setSelectedDay(day);
-    const dayStr = day.toISOString().split('T')[0];
-    const existingEvents = events.filter(e => e.occurred_at.startsWith(dayStr));
+    const dayStr = startOfDay(day).toISOString().split('T')[0];
+    const existingEvents = events.filter(e => {
+      const eventDate = new Date(e.occurred_at);
+      return startOfDay(eventDate).toISOString().split('T')[0] === dayStr;
+    });
     
     if (existingEvents.length === 0) {
       addEvent(day);
@@ -200,8 +213,11 @@ const Calendar = () => {
   };
 
   const getDayContent = (day: Date) => {
-    const dayStr = day.toISOString().split('T')[0];
-    const dayEvents = events.filter(e => e.occurred_at.startsWith(dayStr));
+    const dayStr = startOfDay(day).toISOString().split('T')[0];
+    const dayEvents = events.filter(e => {
+      const eventDate = new Date(e.occurred_at);
+      return startOfDay(eventDate).toISOString().split('T')[0] === dayStr;
+    });
     const dateNumber = day.getDate();
     
     if (dayEvents.length === 0) {
