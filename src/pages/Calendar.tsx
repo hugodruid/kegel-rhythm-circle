@@ -134,11 +134,6 @@ const Calendar = () => {
     }
   };
 
-  const handleDayClick = (day: Date | undefined) => {
-    if (!day) return;
-    setSelectedDay(day);
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -174,7 +169,6 @@ const Calendar = () => {
             <DayPicker
               mode="single"
               selected={selectedDay}
-              onSelect={handleDayClick}
               modifiers={modifiers}
               modifiersStyles={modifiersStyles}
               components={{
