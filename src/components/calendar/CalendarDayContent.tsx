@@ -25,7 +25,7 @@ export const CalendarDayContent = ({
 
   const handleDayClick = (e: React.MouseEvent) => {
     // If the click is coming from within the popover content, don't trigger the add event
-    if (e.target instanceof Node && e.target.closest('[data-popover-content]')) {
+    if (e.target instanceof Element && e.target.closest('[data-popover-content]')) {
       e.stopPropagation();
       return;
     }
