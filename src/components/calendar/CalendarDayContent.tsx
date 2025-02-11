@@ -29,6 +29,7 @@ export const CalendarDayContent = ({
   const dateNumber = date.getDate();
   const dateId = date.toISOString();
   const [isHovering, setIsHovering] = useState(false);
+  const [isTimeInputActive, setIsTimeInputActive] = useState(false);
 
   const handleMouseEnter = () => {
     setIsHovering(true);
@@ -37,12 +38,22 @@ export const CalendarDayContent = ({
 
   const handleMouseLeave = () => {
     setIsHovering(false);
-    // Only close if we're not hovering the content
+    // Only close if we're not hovering the content and not interacting with time input
     setTimeout(() => {
-      if (!isHovering) {
+      if (!isHovering && !isTimeInputActive) {
         onPopoverChange(null);
       }
-    }, 100);
+    }, 200); // Increased delay for smoother interaction
+  };
+
+  const handlePopoverLeave = () => {
+    setIsHovering(false);
+    // Only close if we're not interacting with time input
+    if (!isTimeInputActive) {
+      setTimeout(() => {
+        onPopoverChange(null);
+      }, 200);
+    }
   };
 
   return (
@@ -82,10 +93,7 @@ export const CalendarDayContent = ({
       <PopoverContent 
         className="w-80"
         onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => {
-          setIsHovering(false);
-          onPopoverChange(null);
-        }}
+        onMouseLeave={handlePopoverLeave}
       >
         <div className="space-y-4">
           <div className="font-medium">{format(date, 'PPP')}</div>
@@ -98,6 +106,16 @@ export const CalendarDayContent = ({
                     type="time"
                     defaultValue={format(new Date(event.occurred_at), 'HH:mm')}
                     className="w-24"
+                    onFocus={() => setIsTimeInputActive(true)}
+                    onBlur={() => {
+                      setIsTimeInputActive(false);
+                      // Give a small delay before allowing close
+                      setTimeout(() => {
+                        if (!isHovering) {
+                          onPopoverChange(null);
+                        }
+                      }, 200);
+                    }}
                     onChange={(e) => onUpdateEventTime(event.id, e.target.value)}
                   />
                 </div>
