@@ -26,10 +26,7 @@ export const CalendarDayContent = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          className="w-full h-full p-0 hover:bg-transparent data-[state=open]:bg-accent rounded-none"
-        >
+        <div className="w-full h-full p-2 rounded-none hover:bg-accent/50 cursor-pointer">
           {events.length === 0 ? (
             <div className="text-black font-medium">
               {dateNumber}
@@ -49,11 +46,11 @@ export const CalendarDayContent = ({
               </div>
             </div>
           )}
-        </Button>
+        </div>
       </PopoverTrigger>
       <PopoverContent 
         className="w-80 z-50"
-        onClick={(e) => e.stopPropagation()} // Prevent click from bubbling up
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="space-y-4">
           <div className="font-medium">{format(date, 'PPP')}</div>
@@ -67,14 +64,14 @@ export const CalendarDayContent = ({
                     defaultValue={format(new Date(event.occurred_at), 'HH:mm')}
                     className="w-24"
                     onChange={(e) => onUpdateEventTime(event.id, e.target.value)}
-                    onClick={(e) => e.stopPropagation()} // Prevent input clicks from closing popover
+                    onClick={(e) => e.stopPropagation()}
                   />
                 </div>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent button click from closing popover
+                    e.stopPropagation();
                     onDeleteEvent(event.id);
                   }}
                 >
@@ -85,7 +82,7 @@ export const CalendarDayContent = ({
           </div>
           <Button
             onClick={(e) => {
-              e.stopPropagation(); // Prevent button click from closing popover
+              e.stopPropagation();
               onAddEvent(date);
             }}
             className="w-full"
