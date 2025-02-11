@@ -14,6 +14,7 @@ const Calendar = () => {
   const [selectedDay, setSelectedDay] = useState<Date>();
   const [events, setEvents] = useState<EjaculationEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [openPopoverId, setOpenPopoverId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -184,6 +185,8 @@ const Calendar = () => {
                     onAddEvent={handleAddEvent}
                     onUpdateEventTime={handleUpdateEventTime}
                     onDeleteEvent={handleDeleteEvent}
+                    openPopoverId={openPopoverId}
+                    onPopoverChange={setOpenPopoverId}
                   />
                 )
               }}

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Clock, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { EjaculationEvent } from "@/types/calendar";
+import { useState } from "react";
 
 interface CalendarDayContentProps {
   date: Date;
@@ -12,6 +13,8 @@ interface CalendarDayContentProps {
   onAddEvent: (date: Date) => void;
   onUpdateEventTime: (eventId: string, newTime: string) => void;
   onDeleteEvent: (eventId: string) => void;
+  openPopoverId: string | null;
+  onPopoverChange: (id: string | null) => void;
 }
 
 export const CalendarDayContent = ({
@@ -20,15 +23,43 @@ export const CalendarDayContent = ({
   onAddEvent,
   onUpdateEventTime,
   onDeleteEvent,
+  openPopoverId,
+  onPopoverChange,
 }: CalendarDayContentProps) => {
   const dateNumber = date.getDate();
+  const dateId = date.toISOString();
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsHovering(true);
+    onPopoverChange(dateId);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+    // Only close if we're not hovering the content
+    setTimeout(() => {
+      if (!isHovering) {
+        onPopoverChange(null);
+      }
+    }, 100);
+  };
 
   return (
-    <Popover>
+    <Popover open={openPopoverId === dateId}>
       <PopoverTrigger asChild>
-        <div className="w-full h-full p-2 rounded-none hover:bg-accent/50 cursor-pointer">
+        <div 
+          className="w-full h-full p-2 rounded-none hover:bg-accent/50 cursor-pointer"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onClick={() => {
+            if (events.length === 0) {
+              onAddEvent(date);
+            }
+          }}
+        >
           {events.length === 0 ? (
-            <div className="text-black font-medium" onClick={() => onAddEvent(date)}>
+            <div className="text-black font-medium">
               {dateNumber}
             </div>
           ) : (
@@ -48,7 +79,14 @@ export const CalendarDayContent = ({
           )}
         </div>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent 
+        className="w-80"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => {
+          setIsHovering(false);
+          onPopoverChange(null);
+        }}
+      >
         <div className="space-y-4">
           <div className="font-medium">{format(date, 'PPP')}</div>
           <div className="space-y-2">
