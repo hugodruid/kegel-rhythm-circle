@@ -33,7 +33,7 @@ export const CalendarDayContent = ({
 
   const clearCloseTimeout = () => {
     if (closeTimeoutRef.current) {
-      clearTimeout(clearCloseTimeout.current);
+      clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = undefined;
     }
   };
