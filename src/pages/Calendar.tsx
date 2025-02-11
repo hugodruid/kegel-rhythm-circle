@@ -136,6 +136,11 @@ const Calendar = () => {
   const handleDayClick = (day: Date | undefined) => {
     if (!day) return;
     
+    // Only handle day click if it's coming from the day cell itself
+    // and not from within the popover content
+    const isFromPopover = (event: any)?.target?.closest('[data-popover-content]');
+    if (isFromPopover) return;
+    
     setSelectedDay(day);
     const dayStr = startOfDay(day).toISOString().split('T')[0];
     const existingEvents = events.filter(e => {

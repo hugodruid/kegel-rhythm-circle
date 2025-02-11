@@ -49,8 +49,14 @@ export const CalendarDayContent = ({
         </div>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-80 z-50"
-        onClick={(e) => e.stopPropagation()}
+        className="w-80"
+        data-popover-content
+        onInteractOutside={(e) => {
+          // Prevent closing when clicking inside the popover
+          if (e.target.closest('[data-popover-content]')) {
+            e.preventDefault();
+          }
+        }}
       >
         <div className="space-y-4">
           <div className="font-medium">{format(date, 'PPP')}</div>
@@ -64,7 +70,6 @@ export const CalendarDayContent = ({
                     defaultValue={format(new Date(event.occurred_at), 'HH:mm')}
                     className="w-24"
                     onChange={(e) => onUpdateEventTime(event.id, e.target.value)}
-                    onClick={(e) => e.stopPropagation()}
                   />
                 </div>
                 <Button
