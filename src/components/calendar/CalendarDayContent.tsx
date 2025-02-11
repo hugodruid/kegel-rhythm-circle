@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Clock, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { EjaculationEvent } from "@/types/calendar";
-import { useState, useRef } from "react";
 
 interface CalendarDayContentProps {
   date: Date;
@@ -28,37 +27,15 @@ export const CalendarDayContent = ({
 }: CalendarDayContentProps) => {
   const dateNumber = date.getDate();
   const dateId = date.toISOString();
-  const [isTimeInputActive, setIsTimeInputActive] = useState(false);
-  const closeTimeoutRef = useRef<NodeJS.Timeout>();
-
-  const clearCloseTimeout = () => {
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = undefined;
-    }
-  };
-
-  const handleMouseEnter = () => {
-    clearCloseTimeout();
-    onPopoverChange(dateId);
-  };
-
-  const handlePopoverClose = () => {
-    if (isTimeInputActive) return;
-    
-    clearCloseTimeout();
-    closeTimeoutRef.current = setTimeout(() => {
-      onPopoverChange(null);
-    }, 200);
-  };
 
   return (
-    <Popover open={openPopoverId === dateId}>
+    <Popover 
+      open={openPopoverId === dateId}
+      onOpenChange={(open) => onPopoverChange(open ? dateId : null)}
+    >
       <PopoverTrigger asChild>
         <div 
           className="w-full h-full p-2 rounded-none hover:bg-accent/50 cursor-pointer"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handlePopoverClose}
           onClick={() => {
             if (events.length === 0) {
               onAddEvent(date);
@@ -86,11 +63,7 @@ export const CalendarDayContent = ({
           )}
         </div>
       </PopoverTrigger>
-      <PopoverContent 
-        className="w-80"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handlePopoverClose}
-      >
+      <PopoverContent className="w-80">
         <div className="space-y-4">
           <div className="font-medium">{format(date, 'PPP')}</div>
           <div className="space-y-2">
@@ -102,12 +75,6 @@ export const CalendarDayContent = ({
                     type="time"
                     defaultValue={format(new Date(event.occurred_at), 'HH:mm')}
                     className="w-24"
-                    onFocus={() => setIsTimeInputActive(true)}
-                    onBlur={() => {
-                      setIsTimeInputActive(false);
-                      // Check if we should close the popover after releasing time input
-                      handlePopoverClose();
-                    }}
                     onChange={(e) => onUpdateEventTime(event.id, e.target.value)}
                   />
                 </div>
