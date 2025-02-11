@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar as DayPicker } from "@/components/ui/calendar";
@@ -134,17 +135,7 @@ const Calendar = () => {
 
   const handleDayClick = (day: Date | undefined) => {
     if (!day) return;
-    
     setSelectedDay(day);
-    const dayStr = startOfDay(day).toISOString().split('T')[0];
-    const existingEvents = events.filter(e => {
-      const eventDate = new Date(e.occurred_at);
-      return startOfDay(eventDate).toISOString().split('T')[0] === dayStr;
-    });
-    
-    if (existingEvents.length === 0) {
-      handleAddEvent(day);
-    }
   };
 
   if (isLoading) {
