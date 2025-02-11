@@ -23,10 +23,25 @@ export const CalendarDayContent = ({
 }: CalendarDayContentProps) => {
   const dateNumber = date.getDate();
 
+  const handleDayClick = (e: React.MouseEvent) => {
+    // If the click is coming from within the popover content, don't trigger the add event
+    if (e.target instanceof Node && e.target.closest('[data-popover-content]')) {
+      e.stopPropagation();
+      return;
+    }
+    
+    if (events.length === 0) {
+      onAddEvent(date);
+    }
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <div className="w-full h-full p-2 rounded-none hover:bg-accent/50 cursor-pointer">
+        <div 
+          className="w-full h-full p-2 rounded-none hover:bg-accent/50 cursor-pointer"
+          onClick={handleDayClick}
+        >
           {events.length === 0 ? (
             <div className="text-black font-medium">
               {dateNumber}
@@ -51,12 +66,6 @@ export const CalendarDayContent = ({
       <PopoverContent 
         className="w-80"
         data-popover-content
-        onInteractOutside={(e) => {
-          // Prevent closing when clicking inside the popover
-          if (e.target.closest('[data-popover-content]')) {
-            e.preventDefault();
-          }
-        }}
       >
         <div className="space-y-4">
           <div className="font-medium">{format(date, 'PPP')}</div>
