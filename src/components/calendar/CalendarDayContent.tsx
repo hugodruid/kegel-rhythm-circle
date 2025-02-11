@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Clock, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { EjaculationEvent } from "@/types/calendar";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 interface CalendarDayContentProps {
   date: Date;
@@ -28,32 +28,28 @@ export const CalendarDayContent = ({
 }: CalendarDayContentProps) => {
   const dateNumber = date.getDate();
   const dateId = date.toISOString();
-  const [isHovering, setIsHovering] = useState(false);
   const [isTimeInputActive, setIsTimeInputActive] = useState(false);
+  const closeTimeoutRef = useRef<NodeJS.Timeout>();
+
+  const clearCloseTimeout = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(clearCloseTimeout.current);
+      closeTimeoutRef.current = undefined;
+    }
+  };
 
   const handleMouseEnter = () => {
-    setIsHovering(true);
+    clearCloseTimeout();
     onPopoverChange(dateId);
   };
 
-  const handleMouseLeave = () => {
-    setIsHovering(false);
-    // Only close if we're not hovering the content and not interacting with time input
-    setTimeout(() => {
-      if (!isHovering && !isTimeInputActive) {
-        onPopoverChange(null);
-      }
-    }, 200); // Increased delay for smoother interaction
-  };
-
-  const handlePopoverLeave = () => {
-    setIsHovering(false);
-    // Only close if we're not interacting with time input
-    if (!isTimeInputActive) {
-      setTimeout(() => {
-        onPopoverChange(null);
-      }, 200);
-    }
+  const handlePopoverClose = () => {
+    if (isTimeInputActive) return;
+    
+    clearCloseTimeout();
+    closeTimeoutRef.current = setTimeout(() => {
+      onPopoverChange(null);
+    }, 200);
   };
 
   return (
@@ -62,7 +58,7 @@ export const CalendarDayContent = ({
         <div 
           className="w-full h-full p-2 rounded-none hover:bg-accent/50 cursor-pointer"
           onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          onMouseLeave={handlePopoverClose}
           onClick={() => {
             if (events.length === 0) {
               onAddEvent(date);
@@ -92,8 +88,8 @@ export const CalendarDayContent = ({
       </PopoverTrigger>
       <PopoverContent 
         className="w-80"
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={handlePopoverLeave}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handlePopoverClose}
       >
         <div className="space-y-4">
           <div className="font-medium">{format(date, 'PPP')}</div>
@@ -109,12 +105,8 @@ export const CalendarDayContent = ({
                     onFocus={() => setIsTimeInputActive(true)}
                     onBlur={() => {
                       setIsTimeInputActive(false);
-                      // Give a small delay before allowing close
-                      setTimeout(() => {
-                        if (!isHovering) {
-                          onPopoverChange(null);
-                        }
-                      }, 200);
+                      // Check if we should close the popover after releasing time input
+                      handlePopoverClose();
                     }}
                     onChange={(e) => onUpdateEventTime(event.id, e.target.value)}
                   />
