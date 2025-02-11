@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar as DayPicker } from "@/components/ui/calendar";
@@ -134,6 +133,23 @@ const Calendar = () => {
     }
   };
 
+  const handleDayClick = (day: Date | undefined) => {
+    if (!day) return;
+    
+    const dayId = day.toISOString();
+    const dayEvents = getDayEvents(day);
+    
+    if (dayEvents.length === 0) {
+      // If no events, add one directly
+      handleAddEvent(day);
+    } else {
+      // If has events, toggle the popover
+      setOpenPopoverId(openPopoverId === dayId ? null : dayId);
+    }
+    
+    setSelectedDay(day);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -169,6 +185,7 @@ const Calendar = () => {
             <DayPicker
               mode="single"
               selected={selectedDay}
+              onSelect={handleDayClick}
               modifiers={modifiers}
               modifiersStyles={modifiersStyles}
               components={{
