@@ -12,18 +12,22 @@ import { startOfDay, format } from "date-fns";
 import { CalendarDayContent } from "@/components/calendar/CalendarDayContent";
 import { EjaculationEvent } from "@/types/calendar";
 import { fetchEvents, addEvent, updateEventTime, deleteEvent } from "@/services/eventService";
-
 const Calendar = () => {
   const [selectedDay, setSelectedDay] = useState<Date>();
   const [events, setEvents] = useState<EjaculationEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
       if (!user) {
         toast({
           title: "Authentication required",
@@ -35,10 +39,8 @@ const Calendar = () => {
       }
       fetchEventData();
     };
-
     checkUser();
   }, [navigate]);
-
   const fetchEventData = async () => {
     try {
       const data = await fetchEvents();
@@ -62,10 +64,13 @@ const Calendar = () => {
       setIsLoading(false);
     }
   };
-
   const handleAddEvent = async (date: Date) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
       if (!user) {
         toast({
           title: "Authentication required",
@@ -89,10 +94,13 @@ const Calendar = () => {
       });
     }
   };
-
   const handleUpdateEventTime = async (eventId: string, newTime: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
       if (!user) {
         toast({
           title: "Authentication required",
@@ -124,10 +132,13 @@ const Calendar = () => {
       });
     }
   };
-
   const handleDeleteEvent = async (eventId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
       if (!user) {
         toast({
           title: "Authentication required",
@@ -154,7 +165,6 @@ const Calendar = () => {
       });
     }
   };
-
   const getDayEvents = (date: Date) => {
     const dayStr = startOfDay(date).toISOString().split('T')[0];
     return events.filter(e => {
@@ -162,9 +172,12 @@ const Calendar = () => {
       return startOfDay(eventDate).toISOString().split('T')[0] === dayStr;
     });
   };
-
   const handleDayClick = async (date: Date) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: {
+        user
+      }
+    } = await supabase.auth.getUser();
     if (!user) {
       toast({
         title: "Authentication required",
@@ -174,7 +187,6 @@ const Calendar = () => {
       navigate('/');
       return;
     }
-
     const dayEvents = getDayEvents(date);
     if (dayEvents.length === 0) {
       await handleAddEvent(date);
@@ -182,15 +194,12 @@ const Calendar = () => {
       setSelectedDate(date);
     }
   };
-
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
       </div>;
   }
-
   const selectedDateEvents = selectedDate ? getDayEvents(selectedDate) : [];
-
   return <div className="min-h-screen p-4">
       <Card>
         <CardHeader>
@@ -198,22 +207,12 @@ const Calendar = () => {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center space-y-4">
-            <DayPicker 
-              mode="single" 
-              selected={selectedDay} 
-              onSelect={setSelectedDay} 
-              onDayClick={handleDayClick}
-              components={{
-                DayContent: ({ date }) => (
-                  <CalendarDayContent date={date} events={getDayEvents(date)} />
-                )
-              }}
-              footer={
-                <div className="mt-4 text-center text-sm text-gray-500">
-                  Click on a date to add event 💦 Track your ejaculations.
-                </div>
-              }
-            />
+            <DayPicker mode="single" selected={selectedDay} onSelect={setSelectedDay} onDayClick={handleDayClick} components={{
+            DayContent: ({
+              date
+            }) => <CalendarDayContent date={date} events={getDayEvents(date)} />
+          }} footer={<div className="mt-4 text-center text-sm text-gray-500">Click on a date to add event 💦
+Track your ejaculations.</div>} />
           </div>
         </CardContent>
       </Card>
@@ -225,22 +224,15 @@ const Calendar = () => {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              {selectedDateEvents.map(event => (
-                <div key={event.id} className="flex items-center justify-between bg-secondary p-2 rounded">
+              {selectedDateEvents.map(event => <div key={event.id} className="flex items-center justify-between bg-secondary p-2 rounded">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
-                    <Input
-                      type="time"
-                      defaultValue={format(new Date(event.occurred_at), 'HH:mm')}
-                      className="w-24"
-                      onChange={e => handleUpdateEventTime(event.id, e.target.value)}
-                    />
+                    <Input type="time" defaultValue={format(new Date(event.occurred_at), 'HH:mm')} className="w-24" onChange={e => handleUpdateEventTime(event.id, e.target.value)} />
                   </div>
                   <Button variant="ghost" size="icon" onClick={() => handleDeleteEvent(event.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                </div>
-              ))}
+                </div>)}
             </div>
             <Button onClick={() => selectedDate && handleAddEvent(selectedDate)} className="w-full" variant="outline">
               <Plus className="h-4 w-4 mr-2" />
@@ -251,5 +243,4 @@ const Calendar = () => {
       </Dialog>
     </div>;
 };
-
 export default Calendar;
