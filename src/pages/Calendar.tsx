@@ -171,8 +171,7 @@ const Calendar = () => {
               date
             }) => <CalendarDayContent date={date} events={getDayEvents(date)} />
           }} footer={<div className="mt-4 text-center text-sm text-gray-500">Click on a date to add event 💦
-Track your ejaculations.
-          </div>} />
+Track your ejaculations.</div>} />
           </div>
         </CardContent>
       </Card>
