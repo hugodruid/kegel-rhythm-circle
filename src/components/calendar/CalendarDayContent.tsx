@@ -12,6 +12,8 @@ interface CalendarDayContentProps {
   onAddEvent: (date: Date) => void;
   onUpdateEventTime: (eventId: string, newTime: string) => void;
   onDeleteEvent: (eventId: string) => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export const CalendarDayContent = ({
@@ -20,19 +22,21 @@ export const CalendarDayContent = ({
   onAddEvent,
   onUpdateEventTime,
   onDeleteEvent,
+  isOpen,
+  onOpenChange,
 }: CalendarDayContentProps) => {
   const dateNumber = date.getDate();
 
   return (
     <div className="relative w-full h-full flex items-center justify-center">
-      <Popover>
-        <div>
+      <Popover open={isOpen} onOpenChange={onOpenChange}>
+        <PopoverTrigger asChild>
           {events.length === 0 ? (
-            <div className="text-black font-medium">
+            <div className="text-black font-medium cursor-pointer">
               {dateNumber}
             </div>
           ) : (
-            <div className="relative bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center">
+            <div className="relative bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer">
               <span className="text-white/90">{dateNumber}</span>
               <div className="absolute inset-0 flex items-center justify-center">
                 💦
@@ -44,10 +48,7 @@ export const CalendarDayContent = ({
               </div>
             </div>
           )}
-          <PopoverTrigger asChild>
-            <div className="absolute inset-0 cursor-pointer" />
-          </PopoverTrigger>
-        </div>
+        </PopoverTrigger>
         <PopoverContent align="start" className="w-80">
           <div className="space-y-4">
             <div className="font-medium">{format(date, 'PPP')}</div>

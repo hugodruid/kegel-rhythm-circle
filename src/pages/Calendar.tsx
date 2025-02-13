@@ -14,6 +14,7 @@ const Calendar = () => {
   const [selectedDay, setSelectedDay] = useState<Date>();
   const [events, setEvents] = useState<EjaculationEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [openPopoverDate, setOpenPopoverDate] = useState<Date | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -141,6 +142,10 @@ const Calendar = () => {
     });
   };
 
+  const handleDayClick = (date: Date) => {
+    setOpenPopoverDate(date);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -161,6 +166,7 @@ const Calendar = () => {
               mode="single"
               selected={selectedDay}
               onSelect={setSelectedDay}
+              onDayClick={handleDayClick}
               components={{
                 DayContent: ({ date }) => (
                   <CalendarDayContent
@@ -169,6 +175,10 @@ const Calendar = () => {
                     onAddEvent={handleAddEvent}
                     onUpdateEventTime={handleUpdateEventTime}
                     onDeleteEvent={handleDeleteEvent}
+                    isOpen={openPopoverDate?.getTime() === date.getTime()}
+                    onOpenChange={(open) => {
+                      if (!open) setOpenPopoverDate(null);
+                    }}
                   />
                 )
               }}
