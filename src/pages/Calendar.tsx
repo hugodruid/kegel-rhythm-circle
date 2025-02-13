@@ -146,8 +146,15 @@ const Calendar = () => {
     });
   };
 
-  const handleDayClick = (date: Date) => {
-    setSelectedDate(date);
+  const handleDayClick = async (date: Date) => {
+    const dayEvents = getDayEvents(date);
+    if (dayEvents.length === 0) {
+      // If no events, directly add one
+      await handleAddEvent(date);
+    } else {
+      // If has events, open dialog for management
+      setSelectedDate(date);
+    }
   };
 
   if (isLoading) {
