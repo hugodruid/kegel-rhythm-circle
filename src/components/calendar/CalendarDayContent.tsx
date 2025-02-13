@@ -12,8 +12,6 @@ interface CalendarDayContentProps {
   onAddEvent: (date: Date) => void;
   onUpdateEventTime: (eventId: string, newTime: string) => void;
   onDeleteEvent: (eventId: string) => void;
-  openPopoverId: string | null;
-  onPopoverChange: (id: string | null) => void;
 }
 
 export const CalendarDayContent = ({
@@ -22,22 +20,13 @@ export const CalendarDayContent = ({
   onAddEvent,
   onUpdateEventTime,
   onDeleteEvent,
-  openPopoverId,
-  onPopoverChange,
 }: CalendarDayContentProps) => {
   const dateNumber = date.getDate();
-  const dateId = date.toISOString();
 
   return (
-    <Popover 
-      open={openPopoverId === dateId}
-      onOpenChange={(open) => onPopoverChange(open ? dateId : null)}
-    >
+    <Popover>
       <PopoverTrigger asChild>
-        <button 
-          className="w-full h-full hover:bg-accent/50 transition-colors"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <button className="w-full h-full hover:bg-accent/50 transition-colors">
           {events.length === 0 ? (
             <div className="text-black font-medium">
               {dateNumber}
@@ -77,10 +66,7 @@ export const CalendarDayContent = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDeleteEvent(event.id);
-                  }}
+                  onClick={() => onDeleteEvent(event.id)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar as DayPicker } from "@/components/ui/calendar";
@@ -13,7 +14,6 @@ const Calendar = () => {
   const [selectedDay, setSelectedDay] = useState<Date>();
   const [events, setEvents] = useState<EjaculationEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [openPopoverId, setOpenPopoverId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -133,21 +133,12 @@ const Calendar = () => {
     }
   };
 
-  const handleDayClick = (day: Date | undefined) => {
-    if (!day) return;
-    
-    const dayId = day.toISOString();
-    const dayEvents = getDayEvents(day);
-    
-    if (dayEvents.length === 0) {
-      // If no events, add one directly
-      handleAddEvent(day);
-    } else {
-      // If has events, toggle the popover
-      setOpenPopoverId(openPopoverId === dayId ? null : dayId);
-    }
-    
-    setSelectedDay(day);
+  const getDayEvents = (date: Date) => {
+    const dayStr = startOfDay(date).toISOString().split('T')[0];
+    return events.filter(e => {
+      const eventDate = new Date(e.occurred_at);
+      return startOfDay(eventDate).toISOString().split('T')[0] === dayStr;
+    });
   };
 
   if (isLoading) {
@@ -157,22 +148,6 @@ const Calendar = () => {
       </div>
     );
   }
-
-  const modifiers = {
-    event: events.map(event => new Date(event.occurred_at)),
-  };
-
-  const modifiersStyles = {
-    event: { color: 'white', backgroundColor: '#3b82f6' },
-  };
-
-  const getDayEvents = (date: Date) => {
-    const dayStr = startOfDay(date).toISOString().split('T')[0];
-    return events.filter(e => {
-      const eventDate = new Date(e.occurred_at);
-      return startOfDay(eventDate).toISOString().split('T')[0] === dayStr;
-    });
-  };
 
   return (
     <div className="min-h-screen p-4">
@@ -185,9 +160,7 @@ const Calendar = () => {
             <DayPicker
               mode="single"
               selected={selectedDay}
-              onSelect={handleDayClick}
-              modifiers={modifiers}
-              modifiersStyles={modifiersStyles}
+              onSelect={setSelectedDay}
               components={{
                 DayContent: ({ date }) => (
                   <CalendarDayContent
@@ -196,8 +169,6 @@ const Calendar = () => {
                     onAddEvent={handleAddEvent}
                     onUpdateEventTime={handleUpdateEventTime}
                     onDeleteEvent={handleDeleteEvent}
-                    openPopoverId={openPopoverId}
-                    onPopoverChange={setOpenPopoverId}
                   />
                 )
               }}
