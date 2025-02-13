@@ -1,7 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { KegalTimer } from "@/components/KegalTimer";
 import { ExerciseControls } from "@/components/ExerciseControls";
 import { Slider } from "@/components/ui/slider";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import type { User } from "@supabase/supabase-js";
 
 type TimerMode = 'normal' | 'fast' | 'very-fast';
 
@@ -9,6 +13,17 @@ const Index = () => {
   const [isActive, setIsActive] = useState(false);
   const [time, setTime] = useState(0);
   const [mode, setMode] = useState<TimerMode>('normal');
+  const [user, setUser] = useState<User | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+
+    checkUser();
+  }, []);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -22,12 +37,38 @@ const Index = () => {
     return () => clearInterval(interval);
   }, [isActive]);
 
-  const handleToggle = () => {
+  const handleToggle = async () => {
     if (!isActive) {
       setTime(0);
       setIsActive(true);
     } else {
       setIsActive(false);
+      
+      // Save session if user is logged in
+      if (user) {
+        try {
+          const { error } = await supabase
+            .from('exercise_sessions')
+            .insert({
+              user_id: user.id,
+              duration_seconds: time,
+              mode: mode,
+            });
+
+          if (error) throw error;
+
+          toast({
+            title: "Session saved!",
+            description: "Your exercise session has been recorded.",
+          });
+        } catch (error: any) {
+          toast({
+            title: "Error saving session",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+      }
     }
   };
 
@@ -101,6 +142,12 @@ const Index = () => {
           onToggle={handleToggle}
         />
       </div>
+      
+      {!user && !isActive && (
+        <p className="mt-8 text-gray-600 text-center">
+          Sign in to track your exercise sessions!
+        </p>
+      )}
       
       <p className="mt-8 text-gray-600 max-w-md text-center">
         Synchronize your breathing and your pelvic floor contractions with the circle's movement. 
