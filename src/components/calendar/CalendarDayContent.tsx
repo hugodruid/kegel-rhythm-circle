@@ -24,7 +24,7 @@ export const CalendarDayContent = ({
   const dateNumber = date.getDate();
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full flex items-center justify-center">
       <Popover>
         <div>
           {events.length === 0 ? (
@@ -32,17 +32,15 @@ export const CalendarDayContent = ({
               {dateNumber}
             </div>
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="relative bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center">
-                <span className="text-white/90">{dateNumber}</span>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  💦
-                  {events.length > 1 && (
-                    <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                      {events.length}
-                    </span>
-                  )}
-                </div>
+            <div className="relative bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center">
+              <span className="text-white/90">{dateNumber}</span>
+              <div className="absolute inset-0 flex items-center justify-center">
+                💦
+                {events.length > 1 && (
+                  <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    {events.length}
+                  </span>
+                )}
               </div>
             </div>
           )}
