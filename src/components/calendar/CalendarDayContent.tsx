@@ -26,7 +26,7 @@ export const CalendarDayContent = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className="w-full h-full hover:bg-accent/50 transition-colors">
+        <div className="w-full h-full hover:bg-accent/50 transition-colors cursor-pointer">
           {events.length === 0 ? (
             <div className="text-black font-medium">
               {dateNumber}
@@ -46,7 +46,7 @@ export const CalendarDayContent = ({
               </div>
             </div>
           )}
-        </button>
+        </div>
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="space-y-4">
