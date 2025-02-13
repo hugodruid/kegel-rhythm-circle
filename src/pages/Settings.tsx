@@ -6,6 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import { UsernameForm } from "@/components/settings/UsernameForm";
 import { EmailForm } from "@/components/settings/EmailForm";
 import { PasswordForm } from "@/components/settings/PasswordForm";
+import { DeleteAccountForm } from "@/components/settings/DeleteAccountForm";
+import { Separator } from "@/components/ui/separator";
 
 export default function Settings() {
   const [username, setUsername] = useState("");
@@ -79,12 +81,33 @@ export default function Settings() {
 
   return (
     <div className="container max-w-2xl mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-8">Account Settings</h1>
-      
+      <h1 className="text-2xl font-bold mb-2">Account Settings</h1>
+      <p className="text-muted-foreground mb-8">
+        Manage your account settings and preferences
+      </p>
+
       <div className="space-y-6">
-        <UsernameForm initialUsername={username} />
-        <EmailForm initialEmail={email} />
-        <PasswordForm />
+        <div>
+          <h2 className="text-lg font-semibold mb-4">Profile</h2>
+          <UsernameForm initialUsername={username} />
+        </div>
+
+        <Separator />
+
+        <div>
+          <h2 className="text-lg font-semibold mb-4">Authentication</h2>
+          <div className="space-y-6">
+            <EmailForm initialEmail={email} />
+            <PasswordForm />
+          </div>
+        </div>
+
+        <Separator />
+
+        <div>
+          <h2 className="text-lg font-semibold mb-4 text-destructive">Danger Zone</h2>
+          <DeleteAccountForm />
+        </div>
       </div>
     </div>
   );
