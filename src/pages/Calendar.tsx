@@ -3,9 +3,13 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar as DayPicker } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Clock, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { startOfDay } from "date-fns";
+import { startOfDay, format } from "date-fns";
 import { CalendarDayContent } from "@/components/calendar/CalendarDayContent";
 import { EjaculationEvent } from "@/types/calendar";
 import { fetchEvents, addEvent, updateEventTime, deleteEvent } from "@/services/eventService";
@@ -14,7 +18,7 @@ const Calendar = () => {
   const [selectedDay, setSelectedDay] = useState<Date>();
   const [events, setEvents] = useState<EjaculationEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [openDialogDate, setOpenDialogDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -143,7 +147,7 @@ const Calendar = () => {
   };
 
   const handleDayClick = (date: Date) => {
-    setOpenDialogDate(date);
+    setSelectedDate(date);
   };
 
   if (isLoading) {
@@ -153,6 +157,8 @@ const Calendar = () => {
       </div>
     );
   }
+
+  const selectedDateEvents = selectedDate ? getDayEvents(selectedDate) : [];
 
   return (
     <div className="min-h-screen p-4">
@@ -172,13 +178,6 @@ const Calendar = () => {
                   <CalendarDayContent
                     date={date}
                     events={getDayEvents(date)}
-                    onAddEvent={handleAddEvent}
-                    onUpdateEventTime={handleUpdateEventTime}
-                    onDeleteEvent={handleDeleteEvent}
-                    isOpen={openDialogDate?.getTime() === date.getTime()}
-                    onOpenChange={(open) => {
-                      if (!open) setOpenDialogDate(null);
-                    }}
                   />
                 )
               }}
@@ -191,6 +190,46 @@ const Calendar = () => {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={!!selectedDate} onOpenChange={(open) => !open && setSelectedDate(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{selectedDate ? format(selectedDate, 'PPP') : ''}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              {selectedDateEvents.map((event) => (
+                <div key={event.id} className="flex items-center justify-between bg-secondary p-2 rounded">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    <Input
+                      type="time"
+                      defaultValue={format(new Date(event.occurred_at), 'HH:mm')}
+                      className="w-24"
+                      onChange={(e) => handleUpdateEventTime(event.id, e.target.value)}
+                    />
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteEvent(event.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <Button
+              onClick={() => selectedDate && handleAddEvent(selectedDate)}
+              className="w-full"
+              variant="outline"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Event
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
