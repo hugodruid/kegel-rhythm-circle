@@ -1,5 +1,5 @@
 
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Clock, Plus, Trash2 } from "lucide-react";
@@ -28,30 +28,31 @@ export const CalendarDayContent = ({
   const dateNumber = date.getDate();
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center">
-      <Popover open={isOpen} onOpenChange={onOpenChange}>
-        <PopoverTrigger asChild>
-          {events.length === 0 ? (
-            <div className="text-black font-medium cursor-pointer">
-              {dateNumber}
-            </div>
-          ) : (
-            <div className="relative bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer">
-              <span className="text-white/90">{dateNumber}</span>
-              <div className="absolute inset-0 flex items-center justify-center">
-                💦
-                {events.length > 1 && (
-                  <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                    {events.length}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-        </PopoverTrigger>
-        <PopoverContent align="start" className="w-80">
-          <div className="space-y-4">
-            <div className="font-medium">{format(date, 'PPP')}</div>
+    <>
+      {events.length === 0 ? (
+        <div className="text-black font-medium">
+          {dateNumber}
+        </div>
+      ) : (
+        <div className="relative bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center">
+          <span className="text-white/90">{dateNumber}</span>
+          <div className="absolute inset-0 flex items-center justify-center">
+            💦
+            {events.length > 1 && (
+              <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                {events.length}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{format(date, 'PPP')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
             <div className="space-y-2">
               {events.map((event) => (
                 <div key={event.id} className="flex items-center justify-between bg-secondary p-2 rounded">
@@ -80,11 +81,11 @@ export const CalendarDayContent = ({
               variant="outline"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Another Event
+              Add Event
             </Button>
           </div>
-        </PopoverContent>
-      </Popover>
-    </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

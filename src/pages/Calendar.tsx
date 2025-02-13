@@ -14,7 +14,7 @@ const Calendar = () => {
   const [selectedDay, setSelectedDay] = useState<Date>();
   const [events, setEvents] = useState<EjaculationEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [openPopoverDate, setOpenPopoverDate] = useState<Date | null>(null);
+  const [openDialogDate, setOpenDialogDate] = useState<Date | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -143,7 +143,7 @@ const Calendar = () => {
   };
 
   const handleDayClick = (date: Date) => {
-    setOpenPopoverDate(date);
+    setOpenDialogDate(date);
   };
 
   if (isLoading) {
@@ -175,9 +175,9 @@ const Calendar = () => {
                     onAddEvent={handleAddEvent}
                     onUpdateEventTime={handleUpdateEventTime}
                     onDeleteEvent={handleDeleteEvent}
-                    isOpen={openPopoverDate?.getTime() === date.getTime()}
+                    isOpen={openDialogDate?.getTime() === date.getTime()}
                     onOpenChange={(open) => {
-                      if (!open) setOpenPopoverDate(null);
+                      if (!open) setOpenDialogDate(null);
                     }}
                   />
                 )
