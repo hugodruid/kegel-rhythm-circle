@@ -38,7 +38,10 @@ const TermsOfService = () => {
     );
   }
 
-  const content: TermsContent = terms?.content as TermsContent || { sections: [], last_updated: "" };
+  // First cast to unknown, then to our expected type
+  const content = (typeof terms?.content === 'object' && terms?.content !== null 
+    ? terms.content as unknown as TermsContent 
+    : { sections: [], last_updated: "" });
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">

@@ -37,7 +37,10 @@ const PrivacyPolicy = () => {
     );
   }
 
-  const content: PrivacyPolicyContent = policy?.content as PrivacyPolicyContent || { sections: [] };
+  // First cast to unknown, then to our expected type
+  const content = (typeof policy?.content === 'object' && policy?.content !== null 
+    ? policy.content as unknown as PrivacyPolicyContent 
+    : { sections: [] });
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
