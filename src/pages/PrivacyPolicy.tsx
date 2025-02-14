@@ -1,5 +1,4 @@
 
-import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FileText } from "lucide-react";
@@ -38,7 +37,7 @@ const PrivacyPolicy = () => {
     );
   }
 
-  const content: PrivacyPolicyContent = policy?.content || { sections: [] };
+  const content: PrivacyPolicyContent = policy?.content as PrivacyPolicyContent || { sections: [] };
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">

@@ -38,7 +38,7 @@ const TermsOfService = () => {
     );
   }
 
-  const content: TermsContent = terms?.content || { sections: [], last_updated: "" };
+  const content: TermsContent = terms?.content as TermsContent || { sections: [], last_updated: "" };
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
