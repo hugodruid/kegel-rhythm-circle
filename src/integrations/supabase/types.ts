@@ -60,6 +60,30 @@ export type Database = {
         }
         Relationships: []
       }
+      privacy_policy: {
+        Row: {
+          content: Json
+          id: string
+          is_current: boolean | null
+          published_at: string | null
+          version: string
+        }
+        Insert: {
+          content: Json
+          id?: string
+          is_current?: boolean | null
+          published_at?: string | null
+          version: string
+        }
+        Update: {
+          content?: Json
+          id?: string
+          is_current?: boolean | null
+          published_at?: string | null
+          version?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -81,15 +105,66 @@ export type Database = {
         }
         Relationships: []
       }
+      terms_of_service: {
+        Row: {
+          content: Json
+          id: string
+          is_current: boolean | null
+          published_at: string | null
+          version: string
+        }
+        Insert: {
+          content: Json
+          id?: string
+          is_current?: boolean | null
+          published_at?: string | null
+          version: string
+        }
+        Update: {
+          content?: Json
+          id?: string
+          is_current?: boolean | null
+          published_at?: string | null
+          version?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          user_id: string
+          required_role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
