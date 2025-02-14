@@ -105,6 +105,30 @@ export type Database = {
         }
         Relationships: []
       }
+      terms_of_service: {
+        Row: {
+          content: Json
+          id: string
+          is_current: boolean | null
+          published_at: string | null
+          version: string
+        }
+        Insert: {
+          content: Json
+          id?: string
+          is_current?: boolean | null
+          published_at?: string | null
+          version: string
+        }
+        Update: {
+          content?: Json
+          id?: string
+          is_current?: boolean | null
+          published_at?: string | null
+          version?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null

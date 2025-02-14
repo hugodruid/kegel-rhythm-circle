@@ -78,10 +78,17 @@ export const AppLayout = ({
           <SidebarFooter className="px-4 py-2 border-t">
             <div className="flex flex-col items-center space-y-2">
               <p className="text-xs text-gray-500 text-center">© 2025 Pelvic Floor Trainer</p>
-              <Link to="/privacy-policy" className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
-                <FileText className="h-3 w-3" />
-                Privacy Policy
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link to="/privacy-policy" className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
+                  <FileText className="h-3 w-3" />
+                  Privacy Policy
+                </Link>
+                <span className="text-gray-300">•</span>
+                <Link to="/terms-of-service" className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
+                  <FileText className="h-3 w-3" />
+                  Terms of Service
+                </Link>
+              </div>
             </div>
           </SidebarFooter>
         </Sidebar>
