@@ -60,6 +60,30 @@ export type Database = {
         }
         Relationships: []
       }
+      privacy_policy: {
+        Row: {
+          content: Json
+          id: string
+          is_current: boolean | null
+          published_at: string | null
+          version: string
+        }
+        Insert: {
+          content: Json
+          id?: string
+          is_current?: boolean | null
+          published_at?: string | null
+          version: string
+        }
+        Update: {
+          content?: Json
+          id?: string
+          is_current?: boolean | null
+          published_at?: string | null
+          version?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
