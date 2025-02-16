@@ -1,7 +1,7 @@
 
 import { useMemo } from 'react';
 import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, Cell } from 'recharts';
-import { format, parseISO, startOfWeek, addWeeks, getDay, eachMonthOfInterval, subWeeks, differenceInDays } from 'date-fns';
+import { format, parseISO, startOfWeek, addWeeks, eachMonthOfInterval, subWeeks, differenceInDays } from 'date-fns';
 import type { DayData } from '@/utils/analyticsUtils';
 import { getColorIntensity } from '@/utils/analyticsUtils';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -44,7 +44,8 @@ export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
     const today = new Date();
     const endDate = today;
     const startViewDate = subWeeks(endDate, weeksToShow - 1);
-    const startDate = startOfWeek(startViewDate);
+    // Set Monday as start of week
+    const startDate = startOfWeek(startViewDate, { weekStartsOn: 1 });
 
     // Generate month labels
     const months = eachMonthOfInterval({
@@ -81,7 +82,8 @@ export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
     return { chartData: processedData, monthLabels };
   }, [data, weeksToShow]);
 
-  const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  // Updated day labels to start with Monday
+  const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   return (
     <div className="w-full">
