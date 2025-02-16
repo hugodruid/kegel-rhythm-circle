@@ -1,7 +1,6 @@
-
 import { useMemo } from 'react';
 import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, Cell } from 'recharts';
-import { format, parseISO, startOfWeek, addWeeks, getDay } from 'date-fns';
+import { format, parseISO, startOfWeek, addWeeks, getDay, eachMonthOfInterval, subWeeks, differenceInDays } from 'date-fns';
 import type { DayData } from '@/utils/analyticsUtils';
 import { getColorIntensity } from '@/utils/analyticsUtils';
 
@@ -36,10 +35,23 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
-  const chartData = useMemo(() => {
+  const { chartData, monthLabels } = useMemo(() => {
     const today = new Date();
     const startDate = startOfWeek(today);
-    const weeksToShow = 12; // Show 12 weeks of data
+    const weeksToShow = 12;
+    const endDate = today;
+    const startViewDate = subWeeks(endDate, weeksToShow);
+
+    // Generate month labels
+    const months = eachMonthOfInterval({
+      start: startViewDate,
+      end: endDate
+    });
+
+    const monthLabels = months.map(date => ({
+      x: weeksToShow - Math.floor(differenceInDays(endDate, date) / 7),
+      label: format(date, 'MMM')
+    }));
 
     const processedData = [];
     for (let week = 0; week < weeksToShow; week++) {
@@ -62,48 +74,70 @@ export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
         });
       }
     }
-    return processedData;
+    return { chartData: processedData, monthLabels };
   }, [data]);
 
+  const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
   return (
-    <div className="w-full h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <ScatterChart
-          margin={{ top: 10, right: 0, bottom: 10, left: 0 }}
-        >
-          <XAxis
-            type="number"
-            dataKey="x"
-            domain={[0, 11]}
-            tick={false}
-            axisLine={false}
-          />
-          <YAxis
-            type="number"
-            dataKey="y"
-            domain={[0, 6]}
-            tick={false}
-            axisLine={false}
-          />
-          <ZAxis type="number" dataKey="totalDuration" range={[500, 500]} />
-          <Tooltip content={<CustomTooltip />} />
-          <Scatter
-            data={chartData}
-            shape="square"
-            fill="#D6BCFA"
-            fillOpacity={0.8}
-            animationBegin={200}
-            animationDuration={400}
+    <div className="w-full h-80">
+      <div className="relative">
+        <ResponsiveContainer width="100%" height={280}>
+          <ScatterChart
+            margin={{ top: 20, right: 20, bottom: 20, left: 32 }}
           >
-            {chartData.map((entry, index) => (
-              <Cell
-                key={index}
-                fill={entry.totalDuration > 0 ? getColorIntensity(entry.totalDuration) : '#F1F0FB'}
-              />
-            ))}
-          </Scatter>
-        </ScatterChart>
-      </ResponsiveContainer>
+            <XAxis
+              type="number"
+              dataKey="x"
+              domain={[0, 11]}
+              tick={false}
+              axisLine={false}
+            />
+            <YAxis
+              type="number"
+              dataKey="y"
+              domain={[0, 6]}
+              tickFormatter={(value) => dayLabels[value]}
+              tick={{ fontSize: 12, fill: '#666' }}
+              axisLine={false}
+            />
+            <ZAxis type="number" dataKey="totalDuration" range={[500, 500]} />
+            <Tooltip content={<CustomTooltip />} />
+            <Scatter
+              data={chartData}
+              shape="square"
+              fill="#D6BCFA"
+              fillOpacity={0.8}
+              animationBegin={200}
+              animationDuration={400}
+            >
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={index}
+                  fill={entry.totalDuration > 0 ? getColorIntensity(entry.totalDuration) : '#F1F0FB'}
+                />
+              ))}
+            </Scatter>
+          </ScatterChart>
+        </ResponsiveContainer>
+        
+        {/* Month labels */}
+        <div className="absolute top-0 left-32 right-0 flex justify-start pl-2">
+          {monthLabels.map((month, index) => (
+            <div
+              key={index}
+              className="text-sm text-gray-500"
+              style={{
+                position: 'absolute',
+                left: `${(month.x / 12) * 100}%`,
+                transform: 'translateX(-50%)'
+              }}
+            >
+              {month.label}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
