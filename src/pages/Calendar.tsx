@@ -12,6 +12,7 @@ import { startOfDay, format } from "date-fns";
 import { CalendarDayContent } from "@/components/calendar/CalendarDayContent";
 import { EjaculationEvent } from "@/types/calendar";
 import { fetchEvents, addEvent, updateEventTime, deleteEvent } from "@/services/eventService";
+
 const Calendar = () => {
   const [selectedDay, setSelectedDay] = useState<Date>();
   const [events, setEvents] = useState<EjaculationEvent[]>([]);
@@ -21,6 +22,7 @@ const Calendar = () => {
   const {
     toast
   } = useToast();
+
   useEffect(() => {
     const checkUser = async () => {
       const {
@@ -41,6 +43,7 @@ const Calendar = () => {
     };
     checkUser();
   }, [navigate]);
+
   const fetchEventData = async () => {
     try {
       const data = await fetchEvents();
@@ -64,6 +67,7 @@ const Calendar = () => {
       setIsLoading(false);
     }
   };
+
   const handleAddEvent = async (date: Date) => {
     try {
       const {
@@ -94,6 +98,7 @@ const Calendar = () => {
       });
     }
   };
+
   const handleUpdateEventTime = async (eventId: string, newTime: string) => {
     try {
       const {
@@ -132,6 +137,7 @@ const Calendar = () => {
       });
     }
   };
+
   const handleDeleteEvent = async (eventId: string) => {
     try {
       const {
@@ -165,6 +171,7 @@ const Calendar = () => {
       });
     }
   };
+
   const getDayEvents = (date: Date) => {
     const dayStr = startOfDay(date).toISOString().split('T')[0];
     return events.filter(e => {
@@ -172,6 +179,7 @@ const Calendar = () => {
       return startOfDay(eventDate).toISOString().split('T')[0] === dayStr;
     });
   };
+
   const handleDayClick = async (date: Date) => {
     const {
       data: {
@@ -194,12 +202,15 @@ const Calendar = () => {
       setSelectedDate(date);
     }
   };
+
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
       </div>;
   }
+
   const selectedDateEvents = selectedDate ? getDayEvents(selectedDate) : [];
+
   return <div className="min-h-screen p-4">
       <Card>
         <CardHeader>
@@ -207,11 +218,24 @@ const Calendar = () => {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center space-y-4">
-            <DayPicker mode="single" selected={selectedDay} onSelect={setSelectedDay} onDayClick={handleDayClick} components={{
-            DayContent: ({
-              date
-            }) => <CalendarDayContent date={date} events={getDayEvents(date)} />
-          }} footer={<div className="mt-4 text-center text-sm text-gray-500">Click on a date to add 💦 event.</div>} />
+            <DayPicker 
+              mode="single" 
+              selected={selectedDay} 
+              onSelect={setSelectedDay} 
+              onDayClick={handleDayClick}
+              weekStartsOn={1}
+              components={{
+                DayContent: ({
+                  date
+                }) => <CalendarDayContent date={date} events={getDayEvents(date)} />
+              }} 
+              footer={<div className="mt-4 text-center text-sm text-gray-500">
+                Click on a date to add 💦 event.
+                Track your ejaculation events.
+                This will help you track and manage your energy levels,
+                and be more aware of it's effects over time.
+              </div>} 
+            />
           </div>
         </CardContent>
       </Card>
@@ -242,4 +266,5 @@ const Calendar = () => {
       </Dialog>
     </div>;
 };
+
 export default Calendar;

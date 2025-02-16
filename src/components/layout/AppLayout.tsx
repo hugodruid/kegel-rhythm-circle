@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/auth/AuthForm";
@@ -7,15 +8,18 @@ import { Link, useLocation } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarProvider, SidebarTrigger, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+
 interface AppLayoutProps {
   children: React.ReactNode;
 }
+
 export const AppLayout = ({
   children
 }: AppLayoutProps) => {
   const [user, setUser] = useState<User | null>(null);
   const location = useLocation();
   const isMobile = useIsMobile();
+
   useEffect(() => {
     const {
       data: {
@@ -24,8 +28,10 @@ export const AppLayout = ({
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
+
     return () => subscription.unsubscribe();
   }, []);
+
   const menuItems = [{
     title: "Home",
     path: "/",
@@ -35,7 +41,7 @@ export const AppLayout = ({
     path: "/analytics",
     icon: BarChart3
   }, {
-    title: "Calendar",
+    title: "💦 Tracker",
     path: "/calendar",
     icon: CalendarDays
   }, {
@@ -43,6 +49,7 @@ export const AppLayout = ({
     path: "/settings",
     icon: Settings
   }] : [])];
+
   return <SidebarProvider defaultOpen={false}>
       <div className="relative flex min-h-screen w-full bg-background">
         <Sidebar className="fixed left-0 top-0 h-full z-50 border-r shadow-lg">
