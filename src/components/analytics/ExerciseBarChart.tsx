@@ -38,7 +38,9 @@ export const ExerciseBarChart = ({ data }: ExerciseBarChartProps) => {
   const formatYAxis = (value: number) => {
     if (value === 0) return '0';
     if (value < 60) return `${value}s`;
-    return `${Math.floor(value / 60)}m`;
+    const minutes = Math.floor(value / 60);
+    const seconds = value % 60;
+    return seconds > 0 ? `${minutes}m${seconds}s` : `${minutes}m`;
   };
 
   return (
