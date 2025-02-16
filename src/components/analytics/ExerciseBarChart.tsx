@@ -35,6 +35,12 @@ export const ExerciseBarChart = ({ data }: ExerciseBarChartProps) => {
     };
   });
 
+  const formatYAxis = (value: number) => {
+    if (value === 0) return '0';
+    if (value < 60) return `${value}s`;
+    return `${Math.floor(value / 60)}m`;
+  };
+
   return (
     <div className="w-full h-64">
       <ResponsiveContainer width="100%" height="100%">
@@ -49,7 +55,8 @@ export const ExerciseBarChart = ({ data }: ExerciseBarChartProps) => {
           />
           <YAxis
             tick={{ fontSize: 12, fill: '#666' }}
-            tickFormatter={(value) => `${Math.round(value / 60)}m`}
+            tickFormatter={formatYAxis}
+            ticks={[0, 30, 60, 90, 120, 150, 180]}
           />
           <Tooltip content={<CustomTooltip />} />
           <Bar dataKey="normal" stackId="a" fill="#D6BCFA" />
