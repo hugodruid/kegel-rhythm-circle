@@ -211,7 +211,11 @@ const Calendar = () => {
             DayContent: ({
               date
             }) => <CalendarDayContent date={date} events={getDayEvents(date)} />
-          }} footer={<div className="mt-4 text-center text-sm text-gray-500">Click on a date to add 💦 event.</div>} />
+          }} footer={<div className="mt-4 text-center text-sm text-gray-500">Click on a date to add 💦 event. 
+Track your ejaculation events.
+This will help you track and manage 
+your energy levels, and be more aware of 
+it's effects over time.</div>} />
           </div>
         </CardContent>
       </Card>
