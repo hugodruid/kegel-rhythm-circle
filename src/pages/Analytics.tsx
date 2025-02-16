@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "@supabase/supabase-js";
 import { CalendarHeatmap } from "@/components/analytics/CalendarHeatmap";
+import { ExerciseBarChart } from "@/components/analytics/ExerciseBarChart";
 import { processSessionData } from "@/utils/analyticsUtils";
 import type { SessionData } from "@/utils/analyticsUtils";
 
@@ -82,35 +83,21 @@ const Analytics = () => {
         <div className="space-y-6">
           <Card>
             <CardHeader>
+              <CardTitle>Recent Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ExerciseBarChart data={processedData} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Exercise Activity</CardTitle>
             </CardHeader>
             <CardContent>
               <CalendarHeatmap data={processedData} />
             </CardContent>
           </Card>
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {sessions.map((session) => (
-              <Card key={session.id}>
-                <CardHeader>
-                  <CardTitle className="text-lg">
-                    {new Date(session.started_at).toLocaleDateString()} at{' '}
-                    {new Date(session.started_at).toLocaleTimeString()}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-gray-600">
-                      Duration: {Math.floor(session.duration_seconds / 60)}m {session.duration_seconds % 60}s
-                    </p>
-                    <p className="text-gray-600">
-                      Mode: {session.mode.replace('-', ' ')}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
         </div>
       )}
     </div>
