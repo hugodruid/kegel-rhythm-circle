@@ -1,3 +1,4 @@
+
 import { useMemo } from 'react';
 import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, Cell } from 'recharts';
 import { format, parseISO, startOfWeek, addWeeks, getDay, eachMonthOfInterval, subWeeks, differenceInDays } from 'date-fns';
@@ -37,10 +38,10 @@ const CustomTooltip = ({ active, payload }: any) => {
 export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
   const { chartData, monthLabels } = useMemo(() => {
     const today = new Date();
-    const startDate = startOfWeek(today);
-    const weeksToShow = 12;
     const endDate = today;
-    const startViewDate = subWeeks(endDate, weeksToShow);
+    const weeksToShow = 12;
+    const startViewDate = subWeeks(endDate, weeksToShow - 1);
+    const startDate = startOfWeek(startViewDate);
 
     // Generate month labels
     const months = eachMonthOfInterval({
@@ -49,14 +50,14 @@ export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
     });
 
     const monthLabels = months.map(date => ({
-      x: weeksToShow - Math.floor(differenceInDays(endDate, date) / 7),
+      x: Math.floor(differenceInDays(date, startViewDate) / 7),
       label: format(date, 'MMM')
     }));
 
     const processedData = [];
     for (let week = 0; week < weeksToShow; week++) {
       for (let day = 0; day < 7; day++) {
-        const currentDate = addWeeks(startDate, -week);
+        const currentDate = addWeeks(startDate, week);
         currentDate.setDate(currentDate.getDate() + day);
         const dateStr = format(currentDate, 'yyyy-MM-dd');
         
