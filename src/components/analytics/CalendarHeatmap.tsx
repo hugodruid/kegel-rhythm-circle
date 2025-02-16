@@ -4,6 +4,7 @@ import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, ZAxis, Toolti
 import { format, parseISO, startOfWeek, addWeeks, getDay, eachMonthOfInterval, subWeeks, differenceInDays } from 'date-fns';
 import type { DayData } from '@/utils/analyticsUtils';
 import { getColorIntensity } from '@/utils/analyticsUtils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface CalendarHeatmapProps {
   data: DayData[];
@@ -36,10 +37,12 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
+  const isMobile = useIsMobile();
+  const weeksToShow = isMobile ? 8 : 12;
+
   const { chartData, monthLabels } = useMemo(() => {
     const today = new Date();
     const endDate = today;
-    const weeksToShow = 12;
     const startViewDate = subWeeks(endDate, weeksToShow - 1);
     const startDate = startOfWeek(startViewDate);
 
@@ -76,68 +79,70 @@ export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
       }
     }
     return { chartData: processedData, monthLabels };
-  }, [data]);
+  }, [data, weeksToShow]);
 
   const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
     <div className="w-full h-80">
-      <div className="relative">
-        <ResponsiveContainer width="100%" height={280}>
-          <ScatterChart
-            margin={{ top: 20, right: 20, bottom: 20, left: 45 }}
-          >
-            <XAxis
-              type="number"
-              dataKey="x"
-              domain={[0, 11]}
-              tick={false}
-              axisLine={false}
-            />
-            <YAxis
-              type="number"
-              dataKey="y"
-              domain={[0, 6]}
-              tickFormatter={(value) => dayLabels[value]}
-              tick={{ fontSize: 12, fill: '#666' }}
-              axisLine={false}
-              dx={-10}
-            />
-            <ZAxis type="number" dataKey="totalDuration" range={[500, 500]} />
-            <Tooltip content={<CustomTooltip />} />
-            <Scatter
-              data={chartData}
-              shape="square"
-              fill="#D6BCFA"
-              fillOpacity={0.8}
-              animationBegin={200}
-              animationDuration={400}
+      <div className={`relative ${isMobile ? 'overflow-x-auto pb-4' : ''}`}>
+        <div className={`${isMobile ? 'min-w-[600px]' : 'w-full'}`}>
+          <ResponsiveContainer width="100%" height={280}>
+            <ScatterChart
+              margin={{ top: 20, right: 20, bottom: 20, left: 45 }}
             >
-              {chartData.map((entry, index) => (
-                <Cell
-                  key={index}
-                  fill={entry.totalDuration > 0 ? getColorIntensity(entry.totalDuration) : '#F1F0FB'}
-                />
-              ))}
-            </Scatter>
-          </ScatterChart>
-        </ResponsiveContainer>
-        
-        {/* Month labels */}
-        <div className="absolute top-0 left-44 right-0 flex justify-start pl-2">
-          {monthLabels.map((month, index) => (
-            <div
-              key={index}
-              className="text-sm text-gray-500"
-              style={{
-                position: 'absolute',
-                left: `${(month.x / 12) * 100}%`,
-                transform: 'translateX(-50%)'
-              }}
-            >
-              {month.label}
-            </div>
-          ))}
+              <XAxis
+                type="number"
+                dataKey="x"
+                domain={[0, weeksToShow - 1]}
+                tick={false}
+                axisLine={false}
+              />
+              <YAxis
+                type="number"
+                dataKey="y"
+                domain={[0, 6]}
+                tickFormatter={(value) => dayLabels[value]}
+                tick={{ fontSize: 12, fill: '#666' }}
+                axisLine={false}
+                dx={-10}
+              />
+              <ZAxis type="number" dataKey="totalDuration" range={[500, 500]} />
+              <Tooltip content={<CustomTooltip />} />
+              <Scatter
+                data={chartData}
+                shape="square"
+                fill="#D6BCFA"
+                fillOpacity={0.8}
+                animationBegin={200}
+                animationDuration={400}
+              >
+                {chartData.map((entry, index) => (
+                  <Cell
+                    key={index}
+                    fill={entry.totalDuration > 0 ? getColorIntensity(entry.totalDuration) : '#F1F0FB'}
+                  />
+                ))}
+              </Scatter>
+            </ScatterChart>
+          </ResponsiveContainer>
+          
+          {/* Month labels */}
+          <div className="absolute top-0 left-44 right-0 flex justify-start pl-2">
+            {monthLabels.map((month, index) => (
+              <div
+                key={index}
+                className="text-sm text-gray-500"
+                style={{
+                  position: 'absolute',
+                  left: `${(month.x / weeksToShow) * 100}%`,
+                  transform: 'translateX(-50%)'
+                }}
+              >
+                {month.label}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
