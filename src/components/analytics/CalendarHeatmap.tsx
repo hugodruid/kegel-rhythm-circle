@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip } from 'recharts';
+import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, Cell } from 'recharts';
 import { format, parseISO, startOfWeek, addWeeks, getDay } from 'date-fns';
 import type { DayData } from '@/utils/analyticsUtils';
 import { getColorIntensity } from '@/utils/analyticsUtils';
@@ -96,7 +96,7 @@ export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
             animationDuration={400}
           >
             {chartData.map((entry, index) => (
-              <cell
+              <Cell
                 key={index}
                 fill={entry.totalDuration > 0 ? getColorIntensity(entry.totalDuration) : '#F1F0FB'}
               />
