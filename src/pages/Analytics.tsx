@@ -5,16 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "@supabase/supabase-js";
-
-interface ExerciseSession {
-  id: string;
-  started_at: string;
-  duration_seconds: number;
-  mode: 'normal' | 'fast' | 'very-fast';
-}
+import { CalendarHeatmap } from "@/components/analytics/CalendarHeatmap";
+import { processSessionData } from "@/utils/analyticsUtils";
+import type { SessionData } from "@/utils/analyticsUtils";
 
 const Analytics = () => {
-  const [sessions, setSessions] = useState<ExerciseSession[]>([]);
+  const [sessions, setSessions] = useState<SessionData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
@@ -43,7 +39,6 @@ const Analytics = () => {
 
       if (error) throw error;
 
-      // Type assertion to ensure the mode is one of the allowed values
       const typedSessions = (data || []).map(session => ({
         id: session.id,
         started_at: session.started_at,
@@ -71,6 +66,8 @@ const Analytics = () => {
     );
   }
 
+  const processedData = processSessionData(sessions);
+
   return (
     <div className="min-h-screen p-4">
       <h1 className="text-3xl font-semibold text-gray-800 mb-6">Exercise History</h1>
@@ -82,27 +79,38 @@ const Analytics = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {sessions.map((session) => (
-            <Card key={session.id}>
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  {new Date(session.started_at).toLocaleDateString()} at{' '}
-                  {new Date(session.started_at).toLocaleTimeString()}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <p className="text-gray-600">
-                    Duration: {Math.floor(session.duration_seconds / 60)}m {session.duration_seconds % 60}s
-                  </p>
-                  <p className="text-gray-600">
-                    Mode: {session.mode.replace('-', ' ')}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Exercise Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CalendarHeatmap data={processedData} />
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {sessions.map((session) => (
+              <Card key={session.id}>
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    {new Date(session.started_at).toLocaleDateString()} at{' '}
+                    {new Date(session.started_at).toLocaleTimeString()}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <p className="text-gray-600">
+                      Duration: {Math.floor(session.duration_seconds / 60)}m {session.duration_seconds % 60}s
+                    </p>
+                    <p className="text-gray-600">
+                      Mode: {session.mode.replace('-', ' ')}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       )}
     </div>
