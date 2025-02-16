@@ -85,7 +85,7 @@ export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
       <div className="relative">
         <ResponsiveContainer width="100%" height={280}>
           <ScatterChart
-            margin={{ top: 20, right: 20, bottom: 20, left: 32 }}
+            margin={{ top: 20, right: 20, bottom: 20, left: 45 }}
           >
             <XAxis
               type="number"
@@ -101,6 +101,7 @@ export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
               tickFormatter={(value) => dayLabels[value]}
               tick={{ fontSize: 12, fill: '#666' }}
               axisLine={false}
+              dx={-10}
             />
             <ZAxis type="number" dataKey="totalDuration" range={[500, 500]} />
             <Tooltip content={<CustomTooltip />} />
@@ -123,7 +124,7 @@ export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
         </ResponsiveContainer>
         
         {/* Month labels */}
-        <div className="absolute top-0 left-32 right-0 flex justify-start pl-2">
+        <div className="absolute top-0 left-44 right-0 flex justify-start pl-2">
           {monthLabels.map((month, index) => (
             <div
               key={index}
