@@ -1,5 +1,5 @@
 
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { format, parseISO, subDays } from 'date-fns';
 import type { DayData } from '@/utils/analyticsUtils';
 
@@ -13,11 +13,28 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return (
     <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
       <p className="font-semibold mb-2">{format(parseISO(label), 'MMM d')}</p>
-      {payload.map((entry: any) => (
-        <div key={entry.dataKey} className="text-sm">
-          • {entry.dataKey.charAt(0).toUpperCase() + entry.dataKey.slice(1)}: {Math.round(entry.value)}s
-        </div>
-      ))}
+      <div className="mb-2">
+        <p className="font-medium text-sm">Exercise Types:</p>
+        {payload
+          .filter((entry: any) => entry.dataKey.includes('type_'))
+          .map((entry: any) => (
+            entry.value > 0 && (
+              <div key={entry.dataKey} className="text-sm">
+                • {entry.dataKey === 'type_kegal' ? 'Kegel' : 'Relaxation'}: {Math.round(entry.value)}s
+              </div>
+            )
+          ))}
+      </div>
+      <p className="font-medium text-sm">Speeds:</p>
+      {payload
+        .filter((entry: any) => !entry.dataKey.includes('type_'))
+        .map((entry: any) => (
+          entry.value > 0 && (
+            <div key={entry.dataKey} className="text-sm">
+              • {entry.dataKey.charAt(0).toUpperCase() + entry.dataKey.slice(1)}: {Math.round(entry.value)}s
+            </div>
+          )
+        ))}
     </div>
   );
 };
@@ -27,11 +44,14 @@ export const ExerciseBarChart = ({ data }: ExerciseBarChartProps) => {
     const date = format(subDays(new Date(), 7 - i), 'yyyy-MM-dd');
     const dayData = data.find(d => d.date === date) || {
       date,
-      sessions: { normal: 0, fast: 0, 'very-fast': 0 }
+      sessions: { normal: 0, fast: 0, 'very-fast': 0 },
+      exerciseTypes: { kegal: 0, relaxation: 0 }
     };
     return {
       date,
-      ...dayData.sessions
+      ...dayData.sessions,
+      type_kegal: dayData.exerciseTypes?.kegal || 0,
+      type_relaxation: dayData.exerciseTypes?.relaxation || 0
     };
   });
 
@@ -61,9 +81,31 @@ export const ExerciseBarChart = ({ data }: ExerciseBarChartProps) => {
             ticks={[0, 30, 60, 90, 120, 150, 180]}
           />
           <Tooltip content={<CustomTooltip />} />
-          <Bar dataKey="normal" stackId="a" fill="#D6BCFA" />
-          <Bar dataKey="fast" stackId="a" fill="#9F7AEA" />
-          <Bar dataKey="very-fast" stackId="a" fill="#6E59A5" />
+          <Legend 
+            verticalAlign="top" 
+            height={36} 
+            formatter={(value) => {
+              if (value === 'type_kegal') return 'Kegel';
+              if (value === 'type_relaxation') return 'Relaxation';
+              return value.charAt(0).toUpperCase() + value.slice(1);
+            }}
+          />
+          
+          {/* Exercise type bars */}
+          <Bar 
+            dataKey="type_kegal" 
+            name="Kegel" 
+            stackId="type" 
+            fill="#0EA5E9" 
+            fillOpacity={0.8} 
+          />
+          <Bar 
+            dataKey="type_relaxation" 
+            name="Relaxation" 
+            stackId="type" 
+            fill="#22C55E" 
+            fillOpacity={0.8} 
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>

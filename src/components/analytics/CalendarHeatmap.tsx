@@ -1,9 +1,9 @@
 
 import { useMemo } from 'react';
-import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, Cell } from 'recharts';
+import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, Cell, Legend } from 'recharts';
 import { format, parseISO, startOfWeek, addWeeks, eachMonthOfInterval, subWeeks, differenceInDays } from 'date-fns';
 import type { DayData } from '@/utils/analyticsUtils';
-import { getColorIntensity } from '@/utils/analyticsUtils';
+import { getExerciseTypeColorIntensity } from '@/utils/analyticsUtils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface CalendarHeatmapProps {
@@ -20,15 +20,29 @@ const CustomTooltip = ({ active, payload }: any) => {
     <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
       <p className="font-semibold mb-2">{format(date, 'MMMM d, yyyy')}</p>
       <p className="text-sm mb-2">Total Exercise: {Math.round(data.totalDuration)} seconds</p>
-      <div className="space-y-1">
-        {Object.entries(data.sessions).map(([mode, duration]) => (
+      
+      <div className="mb-2">
+        <p className="font-medium text-xs">Exercise Types:</p>
+        {Object.entries(data.exerciseTypes || {}).map(([type, duration]) => (
           duration > 0 && (
-            <div key={mode} className="text-sm">
-              • {mode.charAt(0).toUpperCase() + mode.slice(1)}: {duration}s
+            <div key={type} className="text-sm">
+              • {type === 'kegal' ? 'Kegel' : 'Relaxation'}: {Math.round(duration)}s
             </div>
           )
         ))}
       </div>
+      
+      <div className="mb-2">
+        <p className="font-medium text-xs">Speeds:</p>
+        {Object.entries(data.sessions).map(([mode, duration]) => (
+          duration > 0 && (
+            <div key={mode} className="text-sm">
+              • {mode.charAt(0).toUpperCase() + mode.slice(1)}: {Math.round(duration)}s
+            </div>
+          )
+        ))}
+      </div>
+      
       <div className="mt-2 text-xs text-gray-500">
         Sessions: {data.details.length}
       </div>
@@ -69,13 +83,21 @@ export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
           date: dateStr,
           totalDuration: 0,
           sessions: { normal: 0, fast: 0, 'very-fast': 0 },
+          exerciseTypes: { kegal: 0, relaxation: 0 },
           details: []
         };
+
+        // Determine the dominant exercise type for coloring
+        let dominantType: 'kegal' | 'relaxation' = 'kegal';
+        if ((dayData.exerciseTypes?.relaxation || 0) > (dayData.exerciseTypes?.kegal || 0)) {
+          dominantType = 'relaxation';
+        }
 
         processedData.push({
           ...dayData,
           x: week,
           y: day,
+          dominantType
         });
       }
     }
@@ -128,7 +150,10 @@ export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
               {chartData.map((entry, index) => (
                 <Cell
                   key={index}
-                  fill={entry.totalDuration > 0 ? getColorIntensity(entry.totalDuration) : '#F1F0FB'}
+                  fill={entry.totalDuration > 0 
+                    ? getExerciseTypeColorIntensity(entry.totalDuration, entry.dominantType) 
+                    : '#F1F0FB'
+                  }
                 />
               ))}
             </Scatter>
@@ -150,6 +175,18 @@ export const CalendarHeatmap = ({ data }: CalendarHeatmapProps) => {
               {month.label}
             </div>
           ))}
+        </div>
+      </div>
+      
+      {/* Legend */}
+      <div className="flex justify-center space-x-4 mt-2">
+        <div className="flex items-center">
+          <div className="w-3 h-3 mr-1 rounded-sm" style={{ backgroundColor: '#0EA5E9' }}></div>
+          <span className="text-xs text-gray-600">Kegel</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-3 h-3 mr-1 rounded-sm" style={{ backgroundColor: '#22C55E' }}></div>
+          <span className="text-xs text-gray-600">Relaxation</span>
         </div>
       </div>
     </div>

@@ -35,6 +35,7 @@ export type Database = {
           completed: boolean
           created_at: string
           duration_seconds: number
+          exercise_type: string | null
           id: string
           mode: string
           started_at: string
@@ -44,6 +45,7 @@ export type Database = {
           completed?: boolean
           created_at?: string
           duration_seconds: number
+          exercise_type?: string | null
           id?: string
           mode: string
           started_at?: string
@@ -53,9 +55,34 @@ export type Database = {
           completed?: boolean
           created_at?: string
           duration_seconds?: number
+          exercise_type?: string | null
           id?: string
           mode?: string
           started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pelvic_evaluations: {
+        Row: {
+          created_at: string
+          hold_duration_seconds: number
+          id: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          hold_duration_seconds: number
+          id?: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          hold_duration_seconds?: number
+          id?: string
+          notes?: string | null
           user_id?: string
         }
         Relationships: []
