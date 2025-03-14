@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
 import Calendar from "./pages/Calendar";
+import Evaluation from "./pages/Evaluation";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/settings" element={<Settings />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/calendar" element={<Calendar />} />
+            <Route path="/evaluation" element={<Evaluation />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="*" element={<NotFound />} />

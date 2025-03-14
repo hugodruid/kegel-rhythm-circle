@@ -63,6 +63,30 @@ export type Database = {
         }
         Relationships: []
       }
+      pelvic_evaluations: {
+        Row: {
+          created_at: string
+          hold_duration_seconds: number
+          id: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          hold_duration_seconds: number
+          id?: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          hold_duration_seconds?: number
+          id?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       privacy_policy: {
         Row: {
           content: Json

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { UserMenu } from "@/components/auth/UserMenu";
-import { BarChart3, CalendarDays, FileText, Home, Menu, Settings } from "lucide-react";
+import { BarChart3, CalendarDays, FileText, Home, Menu, Settings, Gauge } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import type { User } from "@supabase/supabase-js";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarProvider, SidebarTrigger, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
@@ -40,6 +40,10 @@ export const AppLayout = ({
     title: "Analytics",
     path: "/analytics",
     icon: BarChart3
+  }, {
+    title: "Pelvic Evaluation",
+    path: "/evaluation",
+    icon: Gauge
   }, {
     title: "💦 Tracker",
     path: "/calendar",
