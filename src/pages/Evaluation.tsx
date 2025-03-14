@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,8 +8,15 @@ import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Gauge, Activity, Clock } from "lucide-react";
+import { Gauge, Activity, Clock, MessageSquare, Save, Edit } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
+import { 
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
 const Evaluation = () => {
   const [isActive, setIsActive] = useState(false);
   const [time, setTime] = useState(0);
@@ -19,12 +27,14 @@ const Evaluation = () => {
     id: string;
     hold_duration_seconds: number;
     created_at: string;
+    notes: string | null;
   }[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const {
-    toast
-  } = useToast();
+  const [selectedEvaluationId, setSelectedEvaluationId] = useState<string | null>(null);
+  const [isEditingNotes, setIsEditingNotes] = useState(false);
+  const [isSavingNotes, setIsSavingNotes] = useState(false);
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   // Check if user is authenticated
@@ -63,7 +73,7 @@ const Evaluation = () => {
       const {
         data,
         error
-      } = await supabase.from('pelvic_evaluations').select('id, hold_duration_seconds, created_at').order('created_at', {
+      } = await supabase.from('pelvic_evaluations').select('id, hold_duration_seconds, created_at, notes').order('created_at', {
         ascending: false
       });
       if (error) throw error;
@@ -96,6 +106,9 @@ const Evaluation = () => {
   const handleStart = () => {
     setTime(0);
     setIsActive(true);
+    setNotes("");
+    setSelectedEvaluationId(null);
+    setIsEditingNotes(false);
   };
 
   // End the evaluation and save result
@@ -112,13 +125,16 @@ const Evaluation = () => {
     }
     try {
       const {
+        data,
         error
       } = await supabase.from('pelvic_evaluations').insert({
         user_id: user.id,
         hold_duration_seconds: time,
-        notes: notes.trim() || null
-      });
+        notes: null // Initially save without notes
+      }).select();
+      
       if (error) throw error;
+      
       toast({
         title: "Evaluation saved!",
         description: `You held for ${formatTime(time)}. Great job!`
@@ -136,10 +152,13 @@ const Evaluation = () => {
       }
 
       // Refresh evaluations list
-      fetchEvaluations();
-
-      // Clear notes
-      setNotes("");
+      await fetchEvaluations();
+      
+      // Set the newly created evaluation as selected
+      if (data && data.length > 0) {
+        setSelectedEvaluationId(data[0].id);
+        setIsEditingNotes(true);
+      }
     } catch (error: any) {
       toast({
         title: "Error saving evaluation",
@@ -149,11 +168,65 @@ const Evaluation = () => {
     }
   };
 
+  // Handle notes editing for a specific evaluation
+  const handleEditNotes = (evaluationId: string, currentNotes: string | null) => {
+    setSelectedEvaluationId(evaluationId);
+    setNotes(currentNotes || "");
+    setIsEditingNotes(true);
+  };
+
+  // Save notes for the selected evaluation
+  const handleSaveNotes = async () => {
+    if (!selectedEvaluationId) return;
+    
+    try {
+      setIsSavingNotes(true);
+      const { error } = await supabase
+        .from('pelvic_evaluations')
+        .update({ notes: notes.trim() || null })
+        .eq('id', selectedEvaluationId);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Notes saved",
+        description: "Your evaluation notes have been updated.",
+      });
+      
+      // Refresh evaluations list
+      await fetchEvaluations();
+      setIsEditingNotes(false);
+      setSelectedEvaluationId(null);
+      setNotes("");
+    } catch (error: any) {
+      toast({
+        title: "Error saving notes",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsSavingNotes(false);
+    }
+  };
+
+  // Cancel editing notes
+  const handleCancelEditNotes = () => {
+    setIsEditingNotes(false);
+    setSelectedEvaluationId(null);
+    setNotes("");
+  };
+
   // Format seconds to MM:SS
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  // Format date to a more readable format
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
   // Get motivational message based on performance
@@ -167,6 +240,7 @@ const Evaluation = () => {
     if (percentage >= 50) return "Good work! You're on the right track.";
     return "Keep practicing! Every session makes you stronger.";
   };
+
   return <div className="min-h-screen p-4">
       <h1 className="text-3xl font-semibold text-gray-800 mb-6">Pelvic Floor Evaluation</h1>
       
@@ -207,12 +281,37 @@ const Evaluation = () => {
                 </p>
               </div>
             </CardContent>
-            <CardFooter className="pt-2">
-              <div className="w-full">
-                <Label htmlFor="notes" className="mb-2 block">Add notes about this evaluation (optional)</Label>
-                <Textarea id="notes" placeholder="How did it feel? Was it harder or easier than usual?" value={notes} onChange={e => setNotes(e.target.value)} disabled={isActive} className="resize-none" />
-              </div>
-            </CardFooter>
+            
+            {isEditingNotes && (
+              <CardFooter className="pt-2 flex-col items-start">
+                <div className="w-full mb-4">
+                  <Label htmlFor="notes" className="mb-2 flex items-center gap-1">
+                    <MessageSquare className="h-4 w-4" />
+                    Add notes about this evaluation
+                  </Label>
+                  <Textarea 
+                    id="notes" 
+                    placeholder="How did it feel? Was it harder or easier than usual?" 
+                    value={notes} 
+                    onChange={e => setNotes(e.target.value)} 
+                    className="resize-none" 
+                    rows={4}
+                    maxLength={500}
+                  />
+                  <div className="text-xs text-gray-500 mt-1 text-right">
+                    {notes.length}/500 characters
+                  </div>
+                </div>
+                <div className="flex gap-2 self-end">
+                  <Button variant="outline" onClick={handleCancelEditNotes} disabled={isSavingNotes}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSaveNotes} disabled={isSavingNotes}>
+                    {isSavingNotes ? 'Saving...' : 'Save Notes'}
+                  </Button>
+                </div>
+              </CardFooter>
+            )}
           </Card>
         </div>
         
@@ -261,18 +360,46 @@ const Evaluation = () => {
             <CardContent>
               {isLoading ? <div className="flex justify-center py-4">
                   <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-                </div> : evaluations.length > 0 ? <div className="space-y-2">
-                  {evaluations.slice(0, 5).map(evaluation => <div key={evaluation.id} className="flex justify-between items-center py-2 border-b last:border-0">
-                      <span className="text-sm text-gray-600">
-                        {new Date(evaluation.created_at).toLocaleDateString()}
-                      </span>
-                      <span className="font-medium">
-                        {formatTime(evaluation.hold_duration_seconds)}
-                      </span>
-                    </div>)}
-                </div> : <p className="text-gray-500 text-center py-2">
-                  Complete your first evaluation to see your results here.
-                </p>}
+                </div> : evaluations.length > 0 ? (
+                  <Accordion type="single" collapsible className="w-full">
+                    {evaluations.slice(0, 5).map(evaluation => (
+                      <AccordionItem key={evaluation.id} value={evaluation.id}>
+                        <AccordionTrigger className="flex justify-between py-3 hover:no-underline hover:bg-gray-50 rounded px-2">
+                          <span className="text-sm text-gray-600">
+                            {formatDate(evaluation.created_at)}
+                          </span>
+                          <span className="font-medium">
+                            {formatTime(evaluation.hold_duration_seconds)}
+                          </span>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2 pb-4">
+                          {evaluation.notes ? (
+                            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-700 mb-2">
+                              {evaluation.notes}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500 italic mb-2">No notes for this evaluation.</p>
+                          )}
+                          
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleEditNotes(evaluation.id, evaluation.notes)}
+                            className="w-full mt-2"
+                          >
+                            <Edit className="h-3.5 w-3.5 mr-1" />
+                            {evaluation.notes ? 'Edit Notes' : 'Add Notes'}
+                          </Button>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                ) : (
+                  <p className="text-gray-500 text-center py-2">
+                    Complete your first evaluation to see your results here.
+                  </p>
+                )
+              }
             </CardContent>
           </Card>
         </div>
