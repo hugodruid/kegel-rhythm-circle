@@ -6,10 +6,11 @@ import { Volume, VolumeX } from "lucide-react";
 interface KegalTimerProps {
   isActive: boolean;
   mode: 'normal' | 'fast' | 'very-fast';
+  exerciseType?: 'kegal' | 'relaxation';
   onComplete?: () => void;
 }
 
-export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
+export const KegalTimer = ({ isActive, mode, exerciseType = 'kegal', onComplete }: KegalTimerProps) => {
   const [isBreathingIn, setIsBreathingIn] = useState(true);
   const [seconds, setSeconds] = useState(0);
   const [soundsLoaded, setSoundsLoaded] = useState(false);
@@ -137,23 +138,50 @@ export const KegalTimer = ({ isActive, mode, onComplete }: KegalTimerProps) => {
     setIsMuted(prev => !prev);
   };
 
+  const getBackgroundColor = () => {
+    return exerciseType === 'kegal' ? 'bg-[#D3E4FD]' : 'bg-[#F2FCE2]';
+  };
+
+  const getCircleColor = () => {
+    return exerciseType === 'kegal' ? 'bg-[#9b87f5]' : 'bg-[#6cb28e]';
+  };
+
+  const getActionText = () => {
+    if (exerciseType === 'kegal') {
+      return isBreathingIn ? "Inhale & Squeeze" : "Exhale & Release";
+    } else {
+      return isBreathingIn ? "Inhale & Push" : "Exhale & Relax";
+    }
+  };
+
+  // For relaxation exercise, we invert the animation behavior
+  const getScaleClass = () => {
+    const isExpanding = exerciseType === 'kegal' ? isBreathingIn : !isBreathingIn;
+    
+    if (isActive) {
+      return isExpanding ? "scale-110" : "scale-[0.6]";
+    }
+    return "scale-[0.6]";
+  };
+
   return (
     <div className="relative w-80 h-80">
-      <div className="absolute inset-0 rounded-full bg-[#D3E4FD]" />
+      <div className={cn("absolute inset-0 rounded-full", getBackgroundColor())} />
       
       <div
         style={{
           transition: isActive ? `transform ${transitionMs}ms ease-in-out` : 'none'
         }}
         className={cn(
-          "absolute inset-4 rounded-full bg-[#9b87f5]",
-          isActive ? (isBreathingIn ? "scale-110" : "scale-[0.6]") : "scale-[0.6]"
+          "absolute inset-4 rounded-full",
+          getCircleColor(),
+          getScaleClass()
         )}
       />
       
       <div className="absolute inset-0 flex items-center justify-center">
         <p className="text-2xl font-medium text-white">
-          {isBreathingIn ? "Inhale & Squeeze" : "Exhale & Release"}
+          {getActionText()}
         </p>
       </div>
 
