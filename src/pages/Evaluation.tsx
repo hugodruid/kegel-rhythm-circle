@@ -171,7 +171,10 @@ const Evaluation = () => {
   };
 
   const handleSaveNotes = async () => {
-    if (!selectedEvaluationId) return;
+    if (!selectedEvaluationId) {
+      console.error("No evaluation selected for saving notes");
+      return;
+    }
     
     try {
       setIsSavingNotes(true);
@@ -192,18 +195,27 @@ const Evaluation = () => {
       }
       
       console.log("Notes saved successfully, response:", data);
-      toast({
-        title: "Notes saved",
-        description: "Your evaluation notes have been updated.",
-      });
       
-      setEvaluations(prevEvaluations => 
-        prevEvaluations.map(evaluation => 
-          evaluation.id === selectedEvaluationId 
-            ? { ...evaluation, notes: notesContent } 
-            : evaluation
-        )
-      );
+      if (data && data.length > 0) {
+        const updatedEvaluations = evaluations.map(item => 
+          item.id === selectedEvaluationId 
+            ? { ...item, notes: data[0].notes } 
+            : item
+        );
+        setEvaluations(updatedEvaluations);
+        
+        toast({
+          title: "Notes saved",
+          description: "Your evaluation notes have been updated.",
+        });
+      } else {
+        await fetchEvaluations();
+        
+        toast({
+          title: "Notes saved",
+          description: "Your evaluation notes have been updated.",
+        });
+      }
       
       setIsEditingNotes(false);
       setSelectedEvaluationId(null);
@@ -413,4 +425,5 @@ const Evaluation = () => {
       </div>
     </div>;
 };
+
 export default Evaluation;
