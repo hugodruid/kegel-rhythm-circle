@@ -67,10 +67,7 @@ const Evaluation = () => {
     try {
       setIsLoading(true);
       console.log("Fetching evaluations...");
-      const {
-        data,
-        error
-      } = await supabase
+      const { data, error } = await supabase
         .from('pelvic_evaluations')
         .select('id, hold_duration_seconds, created_at, notes')
         .order('created_at', { ascending: false });
@@ -200,13 +197,13 @@ const Evaluation = () => {
         description: "Your evaluation notes have been updated.",
       });
       
-      await fetchEvaluations();
-      
-      setEvaluations(prev => prev.map(eval => 
-        eval.id === selectedEvaluationId 
-          ? { ...eval, notes: notesContent } 
-          : eval
-      ));
+      setEvaluations(prevEvaluations => 
+        prevEvaluations.map(evaluation => 
+          evaluation.id === selectedEvaluationId 
+            ? { ...evaluation, notes: notesContent } 
+            : evaluation
+        )
+      );
       
       setIsEditingNotes(false);
       setSelectedEvaluationId(null);
