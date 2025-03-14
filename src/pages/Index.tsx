@@ -108,7 +108,7 @@ const Index = () => {
     if (exerciseType === 'kegal') {
       return "Synchronize your breathing and your pelvic floor contractions with the circle's movement. Inhale and squeeze as it expands, exhale and release as it contracts.";
     } else {
-      return "Synchronize your breathing and your pelvic floor relaxation with the circle's movement. Inhale and push out as it contracts, exhale and relax as it expands.";
+      return "Synchronize your breathing and your pelvic floor relaxation with the circle's movement. Inhale and push outward as it expands, exhale and relax as it contracts.";
     }
   };
   return <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4">

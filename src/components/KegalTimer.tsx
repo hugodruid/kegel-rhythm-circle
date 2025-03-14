@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { Volume, VolumeX } from "lucide-react";
@@ -124,7 +123,7 @@ export const KegalTimer = ({ isActive, mode, exerciseType = 'kegal', onComplete 
         clearInterval(interval);
       }
     };
-  }, [isActive, cycleDuration, soundsLoaded]); // Removed isMuted dependency
+  }, [isActive, cycleDuration, soundsLoaded]); 
 
   // Separate effect for sound playback based on breathing state changes
   useEffect(() => {
@@ -154,12 +153,10 @@ export const KegalTimer = ({ isActive, mode, exerciseType = 'kegal', onComplete 
     }
   };
 
-  // For relaxation exercise, we invert the animation behavior
+  // Animation is now the same for both exercise types
   const getScaleClass = () => {
-    const isExpanding = exerciseType === 'kegal' ? isBreathingIn : !isBreathingIn;
-    
     if (isActive) {
-      return isExpanding ? "scale-110" : "scale-[0.6]";
+      return isBreathingIn ? "scale-110" : "scale-[0.6]";
     }
     return "scale-[0.6]";
   };
