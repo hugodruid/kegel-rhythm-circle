@@ -45,7 +45,7 @@ const Analytics = () => {
         started_at: session.started_at,
         duration_seconds: session.duration_seconds,
         mode: session.mode as 'normal' | 'fast' | 'very-fast',
-        exercise_type: session.exercise_type as 'kegal' | 'relaxation'
+        exercise_type: (session.exercise_type || 'kegal') as 'kegal' | 'relaxation'
       }));
 
       setSessions(typedSessions);

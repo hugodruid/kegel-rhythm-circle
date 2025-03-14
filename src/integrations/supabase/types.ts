@@ -35,6 +35,7 @@ export type Database = {
           completed: boolean
           created_at: string
           duration_seconds: number
+          exercise_type: string | null
           id: string
           mode: string
           started_at: string
@@ -44,6 +45,7 @@ export type Database = {
           completed?: boolean
           created_at?: string
           duration_seconds: number
+          exercise_type?: string | null
           id?: string
           mode: string
           started_at?: string
@@ -53,6 +55,7 @@ export type Database = {
           completed?: boolean
           created_at?: string
           duration_seconds?: number
+          exercise_type?: string | null
           id?: string
           mode?: string
           started_at?: string
