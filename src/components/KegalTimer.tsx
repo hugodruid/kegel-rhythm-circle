@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { Volume, VolumeX } from "lucide-react";
@@ -138,11 +139,11 @@ export const KegalTimer = ({ isActive, mode, exerciseType = 'kegal', onComplete 
   };
 
   const getBackgroundColor = () => {
-    return exerciseType === 'kegal' ? 'bg-[#D3E4FD]' : 'bg-[#F2FCE2]';
+    return exerciseType === 'kegal' ? 'bg-[#EFF6FF]' : 'bg-[#E7F2FD]';
   };
 
   const getCircleColor = () => {
-    return exerciseType === 'kegal' ? 'bg-[#9b87f5]' : 'bg-[#6cb28e]';
+    return exerciseType === 'kegal' ? 'bg-[#3B82F6]' : 'bg-[#60A5FA]';
   };
 
   const getActionText = () => {
