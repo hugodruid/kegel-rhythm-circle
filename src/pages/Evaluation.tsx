@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -171,7 +172,10 @@ const Evaluation = () => {
   };
 
   const handleSaveNotes = async () => {
-    if (!selectedEvaluationId) return;
+    if (!selectedEvaluationId) {
+      console.error("No evaluation selected for saving notes");
+      return;
+    }
     
     try {
       setIsSavingNotes(true);
@@ -180,6 +184,7 @@ const Evaluation = () => {
       const notesContent = notes.trim() === "" ? null : notes.trim();
       console.log("Sending notes content:", notesContent);
       
+      // Make the update request to Supabase
       const { error, data } = await supabase
         .from('pelvic_evaluations')
         .update({ notes: notesContent })
@@ -193,6 +198,7 @@ const Evaluation = () => {
       
       console.log("Notes saved successfully, response:", data);
       
+      // Refresh evaluations data from the database
       await fetchEvaluations();
       
       toast({
