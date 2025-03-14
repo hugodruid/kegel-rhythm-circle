@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -70,13 +69,21 @@ const Evaluation = () => {
   const fetchEvaluations = async () => {
     try {
       setIsLoading(true);
+      console.log("Fetching evaluations...");
       const {
         data,
         error
-      } = await supabase.from('pelvic_evaluations').select('id, hold_duration_seconds, created_at, notes').order('created_at', {
-        ascending: false
-      });
-      if (error) throw error;
+      } = await supabase
+        .from('pelvic_evaluations')
+        .select('id, hold_duration_seconds, created_at, notes')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error("Error fetching evaluations:", error);
+        throw error;
+      }
+      
+      console.log("Fetched evaluations:", data);
       setEvaluations(data || []);
 
       // Calculate statistics
@@ -127,11 +134,14 @@ const Evaluation = () => {
       const {
         data,
         error
-      } = await supabase.from('pelvic_evaluations').insert({
-        user_id: user.id,
-        hold_duration_seconds: time,
-        notes: null // Initially save without notes
-      }).select();
+      } = await supabase
+        .from('pelvic_evaluations')
+        .insert({
+          user_id: user.id,
+          hold_duration_seconds: time,
+          notes: null // Initially save without notes
+        })
+        .select();
       
       if (error) throw error;
       
@@ -160,6 +170,7 @@ const Evaluation = () => {
         setIsEditingNotes(true);
       }
     } catch (error: any) {
+      console.error("Error saving evaluation:", error);
       toast({
         title: "Error saving evaluation",
         description: error.message,
@@ -181,24 +192,31 @@ const Evaluation = () => {
     
     try {
       setIsSavingNotes(true);
+      console.log("Saving notes for evaluation:", selectedEvaluationId, "Notes:", notes);
+      
       const { error } = await supabase
         .from('pelvic_evaluations')
         .update({ notes: notes.trim() || null })
         .eq('id', selectedEvaluationId);
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error updating notes:", error);
+        throw error;
+      }
       
+      console.log("Notes saved successfully");
       toast({
         title: "Notes saved",
         description: "Your evaluation notes have been updated.",
       });
       
-      // Refresh evaluations list
+      // Refresh evaluations list to show updated notes
       await fetchEvaluations();
       setIsEditingNotes(false);
       setSelectedEvaluationId(null);
       setNotes("");
     } catch (error: any) {
+      console.error("Error saving notes:", error);
       toast({
         title: "Error saving notes",
         description: error.message,
