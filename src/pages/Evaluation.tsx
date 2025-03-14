@@ -36,7 +36,6 @@ const Evaluation = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Check if user is authenticated
   useEffect(() => {
     const checkUser = async () => {
       const {
@@ -54,7 +53,6 @@ const Evaluation = () => {
     checkUser();
   }, [navigate]);
 
-  // Timer logic
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isActive) {
@@ -65,7 +63,6 @@ const Evaluation = () => {
     return () => clearInterval(interval);
   }, [isActive]);
 
-  // Fetch previous evaluations
   const fetchEvaluations = async () => {
     try {
       setIsLoading(true);
@@ -86,13 +83,10 @@ const Evaluation = () => {
       console.log("Fetched evaluations:", data);
       setEvaluations(data || []);
 
-      // Calculate statistics
       if (data && data.length > 0) {
-        // Find personal best
         const best = Math.max(...data.map(evaluation => evaluation.hold_duration_seconds));
         setPersonalBest(best);
 
-        // Calculate average
         const sum = data.reduce((acc, evaluation) => acc + evaluation.hold_duration_seconds, 0);
         const avg = Math.round(sum / data.length);
         setAverageTime(avg);
@@ -109,7 +103,6 @@ const Evaluation = () => {
     }
   };
 
-  // Start the evaluation timer
   const handleStart = () => {
     setTime(0);
     setIsActive(true);
@@ -118,7 +111,6 @@ const Evaluation = () => {
     setIsEditingNotes(false);
   };
 
-  // End the evaluation and save result
   const handleRelease = async () => {
     if (!isActive) return;
     setIsActive(false);
@@ -139,7 +131,7 @@ const Evaluation = () => {
         .insert({
           user_id: user.id,
           hold_duration_seconds: time,
-          notes: null // Initially save without notes
+          notes: null
         })
         .select();
       
@@ -150,21 +142,17 @@ const Evaluation = () => {
         description: `You held for ${formatTime(time)}. Great job!`
       });
 
-      // Update personal best if needed
       if (time > personalBest) {
         setPersonalBest(time);
 
-        // Show special toast for new personal best
         toast({
           title: "🎉 New Personal Best!",
           description: `You've set a new record of ${formatTime(time)}!`
         });
       }
 
-      // Refresh evaluations list
       await fetchEvaluations();
       
-      // Set the newly created evaluation as selected
       if (data && data.length > 0) {
         setSelectedEvaluationId(data[0].id);
         setIsEditingNotes(true);
@@ -179,14 +167,12 @@ const Evaluation = () => {
     }
   };
 
-  // Handle notes editing for a specific evaluation
   const handleEditNotes = (evaluationId: string, currentNotes: string | null) => {
     setSelectedEvaluationId(evaluationId);
     setNotes(currentNotes || "");
     setIsEditingNotes(true);
   };
 
-  // Save notes for the selected evaluation
   const handleSaveNotes = async () => {
     if (!selectedEvaluationId) return;
     
@@ -194,24 +180,34 @@ const Evaluation = () => {
       setIsSavingNotes(true);
       console.log("Saving notes for evaluation:", selectedEvaluationId, "Notes:", notes);
       
-      const { error } = await supabase
+      const notesContent = notes.trim() === "" ? null : notes.trim();
+      console.log("Sending notes content:", notesContent);
+      
+      const { error, data } = await supabase
         .from('pelvic_evaluations')
-        .update({ notes: notes.trim() || null })
-        .eq('id', selectedEvaluationId);
+        .update({ notes: notesContent })
+        .eq('id', selectedEvaluationId)
+        .select();
       
       if (error) {
         console.error("Error updating notes:", error);
         throw error;
       }
       
-      console.log("Notes saved successfully");
+      console.log("Notes saved successfully, response:", data);
       toast({
         title: "Notes saved",
         description: "Your evaluation notes have been updated.",
       });
       
-      // Refresh evaluations list to show updated notes
       await fetchEvaluations();
+      
+      setEvaluations(prev => prev.map(eval => 
+        eval.id === selectedEvaluationId 
+          ? { ...eval, notes: notesContent } 
+          : eval
+      ));
+      
       setIsEditingNotes(false);
       setSelectedEvaluationId(null);
       setNotes("");
@@ -227,27 +223,23 @@ const Evaluation = () => {
     }
   };
 
-  // Cancel editing notes
   const handleCancelEditNotes = () => {
     setIsEditingNotes(false);
     setSelectedEvaluationId(null);
     setNotes("");
   };
 
-  // Format seconds to MM:SS
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  // Format date to a more readable format
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
-  // Get motivational message based on performance
   const getMotivationalMessage = () => {
     if (time === 0) return "Ready to test your pelvic floor strength!";
     if (personalBest === 0) return "Great first attempt! Keep practicing.";
