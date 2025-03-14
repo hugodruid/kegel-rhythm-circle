@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { KegalTimer } from "@/components/KegalTimer";
 import { ExerciseControls } from "@/components/ExerciseControls";
@@ -8,10 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import type { User } from "@supabase/supabase-js";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Activity, Leaf } from "lucide-react";
-
 type TimerMode = 'normal' | 'fast' | 'very-fast';
 type ExerciseType = 'kegal' | 'relaxation';
-
 const Index = () => {
   const [isActive, setIsActive] = useState(false);
   const [time, setTime] = useState(0);
@@ -21,7 +18,6 @@ const Index = () => {
   const {
     toast
   } = useToast();
-  
   useEffect(() => {
     const checkUser = async () => {
       const {
@@ -33,7 +29,6 @@ const Index = () => {
     };
     checkUser();
   }, []);
-  
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isActive) {
@@ -43,7 +38,6 @@ const Index = () => {
     }
     return () => clearInterval(interval);
   }, [isActive]);
-  
   const handleToggle = async () => {
     if (!isActive) {
       setTime(0);
@@ -77,13 +71,11 @@ const Index = () => {
       }
     }
   };
-  
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
-  
   const handleSliderChange = (value: number[]) => {
     switch (value[0]) {
       case 0:
@@ -97,7 +89,6 @@ const Index = () => {
         break;
     }
   };
-  
   const getSliderValue = () => {
     switch (mode) {
       case 'normal':
@@ -108,13 +99,11 @@ const Index = () => {
         return [100];
     }
   };
-
   const handleExerciseChange = (value: string) => {
     if (value === "kegal" || value === "relaxation") {
       setExerciseType(value);
     }
   };
-
   const getInstructions = () => {
     if (exerciseType === 'kegal') {
       return "Synchronize your breathing and your pelvic floor contractions with the circle's movement. Inhale and squeeze as it expands, exhale and release as it contracts.";
@@ -122,7 +111,6 @@ const Index = () => {
       return "Synchronize your breathing and your pelvic floor relaxation with the circle's movement. Inhale and push out as it contracts, exhale and relax as it expands.";
     }
   };
-  
   return <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4">
       <div className="flex flex-col items-center mb-2">
         <h1 className="text-3xl font-semibold text-gray-800 mb-3">Pelvic Floor Trainer</h1>
@@ -130,7 +118,7 @@ const Index = () => {
         <ToggleGroup type="single" value={exerciseType} onValueChange={handleExerciseChange} className="mb-1">
           <ToggleGroupItem value="kegal" className="gap-1 data-[state=on]:bg-[#9b87f5] data-[state=on]:text-white" aria-label="Kegal Exercise">
             <Activity className="h-4 w-4" />
-            <span>Kegal</span>
+            <span>Kegel</span>
           </ToggleGroupItem>
           <ToggleGroupItem value="relaxation" className="gap-1 data-[state=on]:bg-[#6cb28e] data-[state=on]:text-white" aria-label="Relaxation Exercise">
             <Leaf className="h-4 w-4" />
@@ -171,5 +159,4 @@ const Index = () => {
       </p>
     </div>;
 };
-
 export default Index;
