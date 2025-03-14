@@ -69,11 +69,11 @@ const Evaluation = () => {
       // Calculate statistics
       if (data && data.length > 0) {
         // Find personal best
-        const best = Math.max(...data.map(eval => eval.hold_duration_seconds));
+        const best = Math.max(...data.map(evaluation => evaluation.hold_duration_seconds));
         setPersonalBest(best);
         
         // Calculate average
-        const sum = data.reduce((acc, eval) => acc + eval.hold_duration_seconds, 0);
+        const sum = data.reduce((acc, evaluation) => acc + evaluation.hold_duration_seconds, 0);
         const avg = Math.round(sum / data.length);
         setAverageTime(avg);
       }
@@ -299,13 +299,13 @@ const Evaluation = () => {
                 </div>
               ) : evaluations.length > 0 ? (
                 <div className="space-y-2">
-                  {evaluations.slice(0, 5).map((eval) => (
-                    <div key={eval.id} className="flex justify-between items-center py-2 border-b last:border-0">
+                  {evaluations.slice(0, 5).map((evaluation) => (
+                    <div key={evaluation.id} className="flex justify-between items-center py-2 border-b last:border-0">
                       <span className="text-sm text-gray-600">
-                        {new Date(eval.created_at).toLocaleDateString()}
+                        {new Date(evaluation.created_at).toLocaleDateString()}
                       </span>
                       <span className="font-medium">
-                        {formatTime(eval.hold_duration_seconds)}
+                        {formatTime(evaluation.hold_duration_seconds)}
                       </span>
                     </div>
                   ))}
