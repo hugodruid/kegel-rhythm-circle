@@ -139,11 +139,11 @@ export const KegalTimer = ({ isActive, mode, exerciseType = 'kegal', onComplete 
   };
 
   const getBackgroundColor = () => {
-    return exerciseType === 'kegal' ? 'bg-[#EFF6FF]' : 'bg-[#E7F2FD]';
+    return exerciseType === 'kegal' ? 'bg-[#E0F2FE]' : 'bg-[#F0FDF4]';
   };
 
   const getCircleColor = () => {
-    return exerciseType === 'kegal' ? 'bg-[#3B82F6]' : 'bg-[#60A5FA]';
+    return exerciseType === 'kegal' ? 'bg-[#0EA5E9]' : 'bg-[#22C55E]';
   };
 
   const getActionText = () => {

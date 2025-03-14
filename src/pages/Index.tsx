@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { KegalTimer } from "@/components/KegalTimer";
 import { ExerciseControls } from "@/components/ExerciseControls";
@@ -126,11 +127,11 @@ const Index = () => {
         <h1 className="text-3xl font-semibold text-gray-800 mb-3">Pelvic Floor Trainer</h1>
         
         <ToggleGroup type="single" value={exerciseType} onValueChange={handleExerciseChange} className="mb-1">
-          <ToggleGroupItem value="kegal" className="gap-1 data-[state=on]:bg-[#3B82F6] data-[state=on]:text-white" aria-label="Kegal Exercise">
+          <ToggleGroupItem value="kegal" className="gap-1 data-[state=on]:bg-[#0EA5E9] data-[state=on]:text-white" aria-label="Kegal Exercise">
             <Activity className="h-4 w-4" />
             <span>Kegel</span>
           </ToggleGroupItem>
-          <ToggleGroupItem value="relaxation" className="gap-1 data-[state=on]:bg-[#60A5FA] data-[state=on]:text-white" aria-label="Relaxation Exercise">
+          <ToggleGroupItem value="relaxation" className="gap-1 data-[state=on]:bg-[#22C55E] data-[state=on]:text-white" aria-label="Relaxation Exercise">
             <Leaf className="h-4 w-4" />
             <span>Relaxation</span>
           </ToggleGroupItem>
