@@ -196,21 +196,26 @@ const Evaluation = () => {
       
       console.log("Notes saved successfully, response:", data);
       
-      await fetchEvaluations();
-      
-      if (data && data.length > 0 && data[0].notes !== undefined) {
+      if (data && data.length > 0) {
         const updatedEvaluations = evaluations.map(item => 
           item.id === selectedEvaluationId 
             ? { ...item, notes: data[0].notes } 
             : item
         );
         setEvaluations(updatedEvaluations);
+        
+        toast({
+          title: "Notes saved",
+          description: "Your evaluation notes have been updated.",
+        });
+      } else {
+        await fetchEvaluations();
+        
+        toast({
+          title: "Notes saved",
+          description: "Your evaluation notes have been updated.",
+        });
       }
-      
-      toast({
-        title: "Notes saved",
-        description: "Your evaluation notes have been updated.",
-      });
       
       setIsEditingNotes(false);
       setSelectedEvaluationId(null);
