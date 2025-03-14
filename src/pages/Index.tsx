@@ -158,7 +158,7 @@ const Index = () => {
       
       <div className="flex flex-col items-center">
         <KegalTimer isActive={isActive} mode={mode} exerciseType={exerciseType} />
-        <ExerciseControls isActive={isActive} onToggle={handleToggle} />
+        <ExerciseControls isActive={isActive} onToggle={handleToggle} exerciseType={exerciseType} />
       </div>
       
       {!user && !isActive && <p className="mt-8 text-gray-600 text-center">
