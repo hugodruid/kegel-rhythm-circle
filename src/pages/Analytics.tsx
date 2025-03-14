@@ -44,7 +44,8 @@ const Analytics = () => {
         id: session.id,
         started_at: session.started_at,
         duration_seconds: session.duration_seconds,
-        mode: session.mode as 'normal' | 'fast' | 'very-fast'
+        mode: session.mode as 'normal' | 'fast' | 'very-fast',
+        exercise_type: session.exercise_type as 'kegal' | 'relaxation'
       }));
 
       setSessions(typedSessions);
@@ -83,7 +84,7 @@ const Analytics = () => {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
+              <CardTitle>Exercise Types</CardTitle>
             </CardHeader>
             <CardContent>
               <ExerciseBarChart data={processedData} />
@@ -92,7 +93,7 @@ const Analytics = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Exercise Activity</CardTitle>
+              <CardTitle>Activity Calendar</CardTitle>
             </CardHeader>
             <CardContent>
               <CalendarHeatmap data={processedData} />
